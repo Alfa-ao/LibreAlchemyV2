@@ -38,7 +38,7 @@ function DrumShiftMapper:BuildMap()
 		if drumInfo and drumInfo.itemId ~= nil then
 			totalDrumsCount = totalDrumsCount + 1 -- Увеличивает счетчик заполненных барабанов
             local uniqueDrumComponents = {}       -- Таблица { [имя_компонента] = 1 }. Хранит уникальные компоненты ВНУТРИ одного барабана.
-            local componentCount = GetTableSize( drumInfo.components ) -- number (int). Общее количество компонентов в предмете барабана.
+            local componentCount = table.nkeys( drumInfo.components ) -- number (int). Общее количество компонентов в предмете барабана.
             
             -- Защита от барабанов без компонентов (предмет есть, но компонентов нет)
 			if componentCount > 0 then
@@ -47,7 +47,7 @@ function DrumShiftMapper:BuildMap()
 				-- Перебирает все возможные сдвиги от -maxCorrections до +maxCorrections
 				for shift = -self._state.maxCorrections, self._state.maxCorrections do
 					-- Вычисляет индекс компонента с учетом сдвига и зацикленности барабана
-                    local targetIndex = MathUtils.safeModulo( basePos + shift, componentCount )
+                    local targetIndex = ( basePos + shift ) % componentCount
 					
                     local componentId = drumInfo.components[ targetIndex ] -- ID компонента (userdata/ResourceId)
 					
