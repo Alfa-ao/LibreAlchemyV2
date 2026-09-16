@@ -14,7 +14,7 @@
 	</userAddonInfo>
 	<ScriptFileRefs>
 		<!-- GetTableSize -->
-		<Item href="/Mods/SampleCommon/SampleAddonBase.lua" />
+		<!-- <Item href="/Mods/SampleCommon/SampleAddonBase.lua" /> -->
 		
 		<!-- OOP -->
 		<Item href="/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua" />
@@ -31,7 +31,7 @@
 		<Item href="Libs/DND/src/DnDManager.lua" />
 		
 		<!-- Utils (Утилиты) -->
-		<Item href="Libs/Utils/MathUtils.lua" />
+		<!-- <Item href="Libs/Utils/MathUtils.lua" /> -->
 		
 		<!-- Core -->
 		<Item href="Scripts/Core/Config.lua" />
