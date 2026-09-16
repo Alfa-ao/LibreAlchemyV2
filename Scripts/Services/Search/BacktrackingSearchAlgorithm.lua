@@ -95,7 +95,8 @@ function BacktrackingSearchAlgorithm:Execute( state, totalCorrections, linesAvai
 					foundSet[ bestRecipe.name ] = true
 					table.insert( foundResults, {
 						recipe = bestRecipe,
-						shifts = MathUtils.shallowCopy( currentShifts ),
+						--shifts = MathUtils.shallowCopy( currentShifts ),
+						shifts = table.sclone( currentShifts ),
 					} )
 				end
 			end
