@@ -36,7 +36,7 @@ function RecipeEvaluator:FindBestRecipe( componentMap, filteredRecipes )
 		end
 		
 		-- Если рецепт полностью собирается и его score выше текущего максимума, сохраняет его
-		if isMatch and recipe.score > bestScore then
+		if isMatch --[[ and recipe.score > bestScore ]] then -- TEST
 			bestRecipe = recipe
 			bestScore = recipe.score
 		end
