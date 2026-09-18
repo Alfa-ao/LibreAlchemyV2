@@ -125,7 +125,7 @@ function AlchemyEvents:OnItemPlaced( params )
     self._debug:LogGeneral( "Count place:", self._state.place.count )
     ----------------------------------------
     
-    -- Если сейчас не стандартный режим отображения, не обновлять текст.
+    -- Если сейчас не стандартный режим отображения, текст не обновляется.
     -- Автоматически переключится.
     if self._state.messageType ~= CONFIG.MESSAGE_NORMAL then
         return
@@ -135,7 +135,7 @@ function AlchemyEvents:OnItemPlaced( params )
     local funcGetMessage = function()
         self._state.taskRefs.funcAlchemyItemPlaced = nil
         
-        -- Если не варим (в меню варки), то оценить возможные рецепты
+        -- Если находимся в МЕНЮ, то показывает "ВОзможно N рецептов"
         if not self._state.reactionSuccess then
             -- Кол-во возможных рецептов (countRecipe) и кол-во требуемых слотов (filledDrumsCount)
             local countRecipe, filledDrumsCount = self._recipe:CountPotential()
