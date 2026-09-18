@@ -20,7 +20,7 @@
 		<Item href="/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua" />
 		
 		<!-- Debug -->
-		<!-- <Item href="Libs/var_dump.lua" /> -->
+		<Item href="Libs/var_dump.lua" />
 		<Item href="Libs/DebugService.lua" />
 		
 		<!-- Enum -->

@@ -56,20 +56,14 @@ function DebugService:Log( category, ... )
 		return
 	end
 	
-	if VAR_DUMP_EXISTS then
-		log( ... )
-		return
-	end
-	
 	local args = {}
 	
-	for i, v in ipairs( { ... } ) do
+	for i, v in ipairs { ... }  do
 		if type( v ) == "function" then
 			args[i] = v() -- Если дебаг блок в функции
-		elseif apitype( v ) == "WString" then
-			-- Если WString, конвертируем в строку
+		elseif not VAR_DUMP_EXISTS and apitype( v ) == "WString" then
 			args[i] = string.format( "WString( %s )", userMods.FromWString( v ) )
-		else
+		elseif not VAR_DUMP_EXISTS then
 			args[i] = tostring( v )
 		end
 	end
