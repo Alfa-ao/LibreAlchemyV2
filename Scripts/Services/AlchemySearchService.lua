@@ -42,11 +42,11 @@ function AlchemySearchService:FindBestRecipes()
 	if firstDrumInfo and firstDrumInfo.maxCorrectionsPerColumn and firstDrumInfo.maxCorrectionsPerColumn > 0 then
 		self._state.maxCorrections = firstDrumInfo.maxCorrectionsPerColumn
 	end
-
-	local totalCorrections = alchemyInfo.correctionCount or 0
+	
+	local totalCorrections = alchemyInfo.correctionCount or 0 -- Доступное количество коррекций (сдвигов барабанов)
 	self._state.drumsCount = alchemyInfo.drumsCount or self._state.drumsCount
 
-	-- Определяет доступность линий алхимии (сдвиги -1, 0, +1)
+	-- Определяет доступность линий (строк) результата в интерфейсе алхимии (сдвиги -1, 0, 1)
 	local linesAvailability = {
 		minusOne = avatar.IsAlchemyLineAvailable( -1 ) and {} or nil,
 		zero     = {},
@@ -55,7 +55,19 @@ function AlchemySearchService:FindBestRecipes()
 
 	-- Строит карту сдвигов для каждого барабана
 	local drumRequiredComponents, totalDrumsCount = self._mapper:BuildMap()
-
+	
+	--log(drumRequiredComponents, totalDrumsCount)
+	--[[ 
+	table(5) {
+		[Аспект акробата] => number(1)
+		[Время] => number(1)
+		[Звериное чутьё] => number(1)
+		[Исцеление] => number(1)
+		[Ослепление] => number(1)
+	}
+	----------------------
+	number(2)
+	 ]]
 	-- Фильтрует глобальный кэш рецептов, оставляя только подходящие по компонентам
 	self._recipe:FilterByComponents( drumRequiredComponents, totalDrumsCount )
 

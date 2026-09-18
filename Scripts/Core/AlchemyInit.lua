@@ -45,7 +45,7 @@ dndManager:Init { defaultCursor = CONFIG.DND.CURSOR }
 -- Маппер сдвигов. Когда барабаны прокручиваются, компоненты меняются. 
 -- Этот класс строит карту: "если сдвинуть барабан на N, то выпадет компонент X"ю
 local drumShiftMapper = DrumShiftMapper()
-drumShiftMapper:Init( state, recipeService )
+drumShiftMapper:Init( state )
 
 -- Перебирает все возможные комбинации сдвигов барабанов, чтобы понять, какие рецепты вообще можно сварить.
 local searchAlgorithm = BacktrackingSearchAlgorithm()

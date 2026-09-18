@@ -28,14 +28,15 @@ end
 --- Инициализация алгоритма поиска.
 --- @param evaluator table RecipeEvaluator
 --------------------------------------------------------------------------------
-function BacktrackingSearchAlgorithm:Init( evaluator ) --- void
+function BacktrackingSearchAlgorithm:Init( evaluator )
 	self._evaluator = evaluator
 end
 
 --------------------------------------------------------------------------------
---- @param state table 
---- @param totalCorrections number
---- @param linesAvailability table
+--- @param state table Глобальное состояние.
+--- @param totalCorrections number Доступное количество коррекций (сдвигов барабанов)
+--- @param linesAvailability table Доступность линий (строк) результата в интерфейсе алхимии (сдвиги -1, 0, 1)
+--- @return table foundResults
 --------------------------------------------------------------------------------
 function BacktrackingSearchAlgorithm:Execute( state, totalCorrections, linesAvailability ) --- table
 	local foundResults = {}
@@ -118,6 +119,6 @@ function BacktrackingSearchAlgorithm:Execute( state, totalCorrections, linesAvai
 			linesAvailability.plusOne
 		)
 	end
-
+	
 	return foundResults
 end

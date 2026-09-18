@@ -2,18 +2,13 @@
 -- Services/Search/DrumShiftMapper.lua
 --------------------------------------------------------------------------------
 
-Class( "DrumShiftMapper", {
-	_state         = nil,
-	_recipeService = nil,
-} )
+Class( "DrumShiftMapper" )
 
 --------------------------------------------------------------------------------
 --- @param state table AlchemyState
---- @param recipeService table AlchemyRecipeService
 --------------------------------------------------------------------------------
-function DrumShiftMapper:Init( state, recipeService )
-	self._state         = state
-	self._recipeService = recipeService
+function DrumShiftMapper:Init( state )
+	self._state = state
 end
 
 --------------------------------------------------------------------------------
@@ -38,35 +33,23 @@ function DrumShiftMapper:BuildMap()
 		if drumInfo and drumInfo.itemId ~= nil then
 			totalDrumsCount = totalDrumsCount + 1 -- Увеличивает счетчик заполненных барабанов
             local uniqueDrumComponents = {}       -- Таблица { [имя_компонента] = 1 }. Хранит уникальные компоненты ВНУТРИ одного барабана.
-            local componentCount = table.nkeys( drumInfo.components ) -- number (int). Общее количество компонентов в предмете барабана.
-            
-            -- Защита от барабанов без компонентов (предмет есть, но компонентов нет)
-			if componentCount > 0 then
-				local basePos = drumInfo.position or 0 -- number (int). Текущая позиция барабана (индекс компонента, который сейчас "в окне").
+			local basePos = drumInfo.position or 0 -- number (int). Текущая позиция барабана (индекс компонента, который сейчас "в окне").
+			
+			-- Перебирается все возможные сдвиги
+			for shift = -self._state.maxCorrections, self._state.maxCorrections do
+				-- Вычисляется индекс компонента
+				local targetIndex = ( basePos + shift ) % self._state.drumSize
 				
-				-- Перебирает все возможные сдвиги от -maxCorrections до +maxCorrections
-				for shift = -self._state.maxCorrections, self._state.maxCorrections do
-					-- Вычисляет индекс компонента с учетом сдвига и зацикленности барабана
-                    local targetIndex = ( basePos + shift ) % componentCount
-					
-                    local componentId = drumInfo.components[ targetIndex ] -- ID компонента (userdata/ResourceId)
-					
-					if componentId then
-						-- Получает string имя компонента через сервис рецептов (кэш имён компонентов)
-						local componentName = self._recipeService:GetComponentName( componentId )
-						if componentName then
-							-- Записывает в карту сдвигов: какой компонент получится при данном сдвиге
-                            self._state.drumShiftMap[ drumIndex ][ shift ] = componentName
-                            -- ОтМечает компонент как уникальный для этого барабана
-                            uniqueDrumComponents[ componentName ] = 1
-						end
-					end
-				end
+				local componentProperty = drumInfo.components[ targetIndex ] -- ID компонента (ComponentPropertyId)
+				-- Записывает в карту сдвигов: какой компонент получится при данном сдвиге
+				self._state.drumShiftMap[ drumIndex ][ shift ] = componentProperty
+				-- ОтМечает компонент как уникальный для этого барабана
+				uniqueDrumComponents[ componentProperty ] = true
 			end
 			
 			-- Добавляет уникальные компоненты этого барабана в общий счетчик требуемых компонентов
-			for componentName, _ in pairs( uniqueDrumComponents ) do
-				drumRequiredComponents[ componentName ] = ( drumRequiredComponents[ componentName ] or 0 ) + 1
+			for componentProperty, _ in pairs( uniqueDrumComponents ) do
+				drumRequiredComponents[ componentProperty ] = ( drumRequiredComponents[ componentProperty ] or 0 ) + 1
 			end
 		end
 	end
