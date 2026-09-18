@@ -16,6 +16,7 @@ Class( "AlchemyState", {
     foundResults = nil,         -- ?table - Таблица найденных вариантов (рецепт + сдвиги барабанов).
     
     -- Параметры ступки (барабанов)
+    drumSize = 0,               -- Количество аспектов (компонентов) в одном барабане.
     drumsCount = 0,             -- number (int) - Кол-во слотов, доступных в ступке.
     maxCorrections = 5,         -- number (int) - Максимальная коррекция (сдвиг) в колбе. 
                                 -- GetAlchemyDrumInfo( 0 ).maxCorrectionsPerColumn выводит 5 
