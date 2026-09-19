@@ -226,7 +226,7 @@ function AlchemyRecipeService:IsRecipeMatch( recipe, availableComponents, filled
 	}
 	 ]]
 	-- Количество заполненных слотов должно совпадать с требуемым кол-вом компонентов
-	if recipe.componentsCount ~= filledSlotsCount then
+	if CONFIG.REQUIRED_COMPONENTS_COUNT and recipe.componentsCount ~= filledSlotsCount then
 		return false
 	end
 	
