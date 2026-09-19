@@ -3,28 +3,22 @@
 -- Сервис для поиска оптимальных рецептов алхимии.
 --------------------------------------------------------------------------------
 
-Class( "AlchemySearchService", {
-	_state     = nil, -- Ссылка на глобальное состояние аддона (AlchemyState).
-	_recipe    = nil, -- Сервис для работы с рецептами (кэширование и фильтрация).
-	_mapper    = nil, -- Маппер сдвигов барабанов (DrumShiftMapper).
-	_algorithm = nil, -- Алгоритм поиска (реализация BacktrackingSearchAlgorithm).
-	_foundSet  = nil, -- Хеш-таблица для отслеживания уникальных найденных рецептов (используется внутри алгоритма).
-} )
+Class( "AlchemySearchService" )
 
 --------------------------------------------------------------------------------
 --- Инициализация сервиса поиска.
 --- Проверяет, что переданный алгоритм реализует требуемый интерфейс.
---- @param state table AlchemyState
---- @param recipeService table AlchemyRecipeService
---- @param mapper table DrumShiftMapper
---- @param algorithm table BacktrackingSearchAlgorithm
+--- @param state table AlchemyState Ссылка на глобальное состояние аддона.
+--- @param recipeService table AlchemyRecipeService Сервис для работы с рецептами (кэширование и фильтрация).
+--- @param mapper table DrumShiftMapper Маппер сдвигов барабанов.
+--- @param algorithm table BacktrackingSearchAlgorithm Алгоритм поиска.
 --------------------------------------------------------------------------------
-function AlchemySearchService:Init( state, recipeService, mapper, algorithm ) --- void
-	self._state      = state
-	self._recipe     = recipeService
-	self._mapper     = mapper
-	self._foundSet   = {}
-	self._algorithm  = algorithm
+function AlchemySearchService:Init( state, recipeService, mapper, algorithm )
+	self._state = state
+	self._recipe = recipeService
+	self._mapper = mapper
+	self._foundSet = {} -- Хеш-таблица для отслеживания уникальных найденных рецептов (используется внутри алгоритма).
+	self._algorithm = algorithm
 end
 
 --------------------------------------------------------------------------------
