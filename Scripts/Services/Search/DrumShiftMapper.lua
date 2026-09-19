@@ -18,11 +18,16 @@ end
 --- @return number totalDrumsCount общее кол-во заполненных барабанов
 --------------------------------------------------------------------------------
 function DrumShiftMapper:BuildMap()
-	local drumRequiredComponents = {} -- Таблица { [имя_компонента] = количество_барабанов }. 
-                                      -- Считает, в скольких барабанах встречается каждый уникальный компонент.
-    self._state.drumShiftMap = {}     -- Инициализируем карту сдвигов в состоянии. 
-                                      -- Структура: { [индекс_барабана] = { [сдвиг] = "имя_компонента" } }
-    local totalDrumsCount = 0         -- number (int). Счетчик барабанов, в которые реально положены предметы (itemId ~= nil).
+	-- Таблица { [имя_компонента] = количество_барабанов }. 
+	-- Считает, в скольких барабанах встречается каждый уникальный компонент.
+	local drumRequiredComponents = {}
+	
+	-- Инициализируем карту сдвигов в состоянии. 
+	-- Таблица: { [индекс_барабана] = { [сдвиг] = "имя_компонента" } }
+    self._state.drumShiftMap = {}
+	
+	-- Счетчик барабанов, в которые положены предметы (itemId ~= nil).
+    local totalDrumsCount = 0
 
     -- Проходит по всем доступным барабанам (от 1 до drumsCount)
 	for drumIndex = 1, self._state.drumsCount do
@@ -31,9 +36,9 @@ function DrumShiftMapper:BuildMap()
 		
 		-- Проверяет, что барабан существует и в него положен предмет
 		if drumInfo and drumInfo.itemId ~= nil then
-			totalDrumsCount = totalDrumsCount + 1 -- Увеличивает счетчик заполненных барабанов
-            local uniqueDrumComponents = {}       -- Таблица { [имя_компонента] = 1 }. Хранит уникальные компоненты ВНУТРИ одного барабана.
-			local basePos = drumInfo.position or 0 -- number (int). Текущая позиция барабана (индекс компонента, который сейчас "в окне").
+			totalDrumsCount = totalDrumsCount + 1
+            local uniqueDrumComponents = {}        -- Таблица { [имя_компонента(ComponentPropertyId)] = true }.
+			local basePos = drumInfo.position or 0 -- Текущая позиция барабана.
 			
 			-- Перебирается все возможные сдвиги
 			for shift = -self._state.maxCorrections, self._state.maxCorrections do
@@ -43,7 +48,6 @@ function DrumShiftMapper:BuildMap()
 				local componentProperty = drumInfo.components[ targetIndex ] -- ID компонента (ComponentPropertyId)
 				-- Записывает в карту сдвигов: какой компонент получится при данном сдвиге
 				self._state.drumShiftMap[ drumIndex ][ shift ] = componentProperty
-				-- ОтМечает компонент как уникальный для этого барабана
 				uniqueDrumComponents[ componentProperty ] = true
 			end
 			
