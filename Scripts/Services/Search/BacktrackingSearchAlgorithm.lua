@@ -38,15 +38,15 @@ end
 --- @param linesAvailability table Доступность линий (строк) результата в интерфейсе алхимии (сдвиги -1, 0, 1)
 --- @return table foundResults
 --------------------------------------------------------------------------------
-function BacktrackingSearchAlgorithm:Execute( state, totalCorrections, linesAvailability ) --- table
+function BacktrackingSearchAlgorithm:Execute( state, totalCorrections, linesAvailability )
 	local foundResults = {}
 	local foundSet = {}
 
 	-- Локальная рекурсивная функция
-	local function recursiveSearch( drumIdx, shiftsLeft, currentShifts, lineZero, lineMinusOne, linePlusOne ) --- void
+	local function recursiveSearch( drumIdx, shiftsLeft, currentShifts, lineZero, lineMinusOne, linePlusOne )
 		local filteredRecipes = state.filteredRecipes
 		
-		-- Если уже нашли все возможные отфильтрованные рецепты, дальше искать нет смысла
+		-- Если уже нашлись все возможные отфильтрованные рецепты, дальше искать нет смысла
 		if filteredRecipes and #filteredRecipes > 0 and #foundResults >= #filteredRecipes then 
 			return 
 		end
@@ -55,7 +55,7 @@ function BacktrackingSearchAlgorithm:Execute( state, totalCorrections, linesAvai
 		if drumIdx > 0 then
 			-- Если для текущего барабана нет возможных сдвигов (он пустой или не инициализирован)
 			if next( state.drumShiftMap[ drumIdx ] ) == nil then
-				currentShifts[ drumIdx ] = 0 -- Фиксируем сдвиг 0
+				currentShifts[ drumIdx ] = 0 -- Фиксируется сдвиг 0
 				-- К следующему (предыдущему по индексу) барабану
 				recursiveSearch( drumIdx - 1, shiftsLeft, currentShifts, lineZero, lineMinusOne, linePlusOne )
 				currentShifts[ drumIdx ] = nil -- Откатывает состояние
@@ -67,7 +67,7 @@ function BacktrackingSearchAlgorithm:Execute( state, totalCorrections, linesAvai
 			
 			-- Перебирает все возможные сдвиги для текущего барабана
 			for shift = -maxShift, maxShift do 
-				local nextLeft = shiftsLeft - math.abs( shift ) -- number (int). Очки коррекции, которые останутся для следующих барабанов.
+				local nextLeft = shiftsLeft - math.abs( shift ) -- Очки коррекции, которые останутся для следующих барабанов.
 				local step = {
                     state = state,
                     drumIdx = drumIdx,
@@ -96,7 +96,6 @@ function BacktrackingSearchAlgorithm:Execute( state, totalCorrections, linesAvai
 					foundSet[ bestRecipe.name ] = true
 					table.insert( foundResults, {
 						recipe = bestRecipe,
-						--shifts = MathUtils.shallowCopy( currentShifts ),
 						shifts = table.sclone( currentShifts ),
 					} )
 				end
