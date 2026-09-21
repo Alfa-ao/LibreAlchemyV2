@@ -10,6 +10,13 @@
 --- @field _eventHandlers table Ссылки на коллбэки для отписки от событий
 --- @field _screenParams table Кэш параметров координат (разрешение экрана)
 Class( "DnDManager", {
+    __CONFIG_VERSION = "1.0.0",
+    _opposite = {
+        posX = "highPosX",
+        posY = "highPosY",
+        highPosX = "posX",
+        highPosY = "posY",
+    },
     _widgets = nil,
     _activeDrag = nil,
     _eventHandlers = nil,
@@ -27,9 +34,7 @@ Class( "DnDManager", {
 function DnDManager:Init( params )
     params = type( params ) == "table" and params or {}
     
-    if self._initialized then
-        error( "DnDManager:Init() has already been called. Re-initialization is not allowed." )
-    end
+    assert( not self._initialized, "DnDManager:Init() has already been called. Re-initialization is not allowed." )
     
     self._initialized = true
 
@@ -117,12 +122,7 @@ function DnDManager:Register( wtMovable, options )
     local dndId = self:AllocateDnDID( options.wtReacting )
     
     -- Если виджет уже зарегистрирован, выбрасывает ошибку.
-    if self._widgets[ dndId ] then
-        error( string.format(
-            "DnDManager:Register() failed: widget is already registered, dndId = %s",
-            tostring( dndId )
-        ) )
-    end
+    assert( self._widgets[ dndId ] == nil, "DnDManager:Register() failed: widget is already registered, dndId = %s", dndId )
     
     local cursor = type( options.cursor ) == "string"
             and options.cursor
@@ -157,13 +157,11 @@ function DnDManager:Register( wtMovable, options )
     end
     
     -- Если виджет уже зарегистрирован в DND-системе, но не менеджером.
-    if options.wtReacting:DNDGetState() ~= DND_STATE_NOT_REGISTERED then
-        error( string.format(
-            "DnDManager:Register() failed: widget is already registered in DND system outside manager, dndId = %s, state = %s",
-            tostring( dndId ),
-            tostring( currentDNDState )
-        ) )
-    end
+    assert( 
+        options.wtReacting:DNDGetState() == DND_STATE_NOT_REGISTERED,
+        "DnDManager:Register() failed: widget is already registered in DND system outside manager, dndId = %s, state = %s",
+        dndId, currentDNDState
+    )
     
     -- isDragOnly = true.
     options.wtReacting:DNDRegister( dndId, true )
@@ -414,8 +412,8 @@ function DnDManager:_HandlePickAttempt( params )
             y = params.posY,
         },
 
-        resetPlacement = self:_CopyPlacement( currentPlace ),
-        currentPlacement = self:_CopyPlacement( currentPlace ),
+        resetPlacement = table.sclone( currentPlace ),
+        currentPlacement = table.sclone( currentPlace ),
 
         limits = nil,
     }
@@ -463,15 +461,7 @@ end
 --- @param argName string Имя аргумента для сообщения об ошибке.
 --------------------------------------------------------------------------------
 function DnDManager:_ValidateWidget( widget, argName )
-    if not self:_IsWidget( widget ) then
-        local apiType = apitype( widget )
-
-        error( string.format(
-            "FATAL: Widget expected for %s, got %s",
-            argName,
-            apiType
-        ) )
-    end
+    assert( self:_IsWidget( widget ), "FATAL: Widget expected for %s, got %s", argName, apitype( widget ) )
 end
 
 
@@ -512,12 +502,7 @@ function DnDManager:_NormalizePadding( padding )
     end
 
     for i = 1, 4 do
-        if padding[ i ] ~= nil and type( padding[ i ] ) ~= "number" then
-            error( string.format(
-                "DnDManager: padding[ %d ] must be a number or nil",
-                i
-            ) )
-        end
+        assert( type( padding[ i ] ) == "number", "DnDManager: padding[ %d ] must be a number or nil", i )
     end
     
     return padding
@@ -580,7 +565,7 @@ function DnDManager:_StopDragging( success )
             } )
         end
 
-        state.info.initialPlacement = self:_CopyPlacement( state.currentPlacement )
+        state.info.initialPlacement = table.sclone( state.currentPlacement )
     else
         state.info.wtMovable:SetPlacementPlain( state.resetPlacement )
     end
@@ -735,39 +720,30 @@ end
 --- @return table Place
 --------------------------------------------------------------------------------
 function DnDManager:_NormalizePlacement( Place, limitMin, limitMax )
-    local Opposite = {
-        posX = "highPosX",
-        posY = "highPosY",
-        highPosX = "posX",
-        highPosY = "posY",
-    }
-
-    limitMax = limitMax or {}
-    limitMin = limitMin or {}
-
-    for k, v in pairs( limitMax ) do
-        if Place[k] and Place[k] > v then
-            if Place[ Opposite[k] ] then
-                Place[ Opposite[k] ] = Place[ Opposite[k] ] + Place[k] - v
-            end
-
-            Place[k] = v
+    for k, v in pairs( Place ) do
+        local targetVal = v
+        local maxVal = limitMax[k]
+        local minVal = limitMin[k]
+        
+        if maxVal and v > maxVal then
+            targetVal = maxVal
         end
-    end
-
-    for k, v in pairs( limitMin ) do
-        if Place[k] and Place[k] < v then
-            if Place[ Opposite[k] ] then
-                Place[ Opposite[k] ] = Place[ Opposite[k] ] + Place[k] - v
+        
+        if minVal and targetVal < minVal then
+            targetVal = minVal
+        end
+        
+        if targetVal ~= v then
+            local oppKey = self._opposite[k]
+            if oppKey and Place[oppKey] then
+                Place[oppKey] = Place[oppKey] + v - targetVal
             end
-
-            Place[k] = v
+            Place[k] = targetVal
         end
     end
 
     return Place
 end
-
 
 --------------------------------------------------------------------------------
 --- Событие: Перемещение курсора во время перетаскивания
@@ -825,7 +801,7 @@ end
 --- Событие: Изменение разрешения экрана / масштаба
 --------------------------------------------------------------------------------
 function DnDManager:_HandlePosConverterChanged()
-    -- Если прямо сейчас что-то тащат, отменить (иначе координаты улетят в космос)
+    -- Если прямо сейчас что-то тащится, отменяется, иначе координаты улетят в космос
     if self:IsDragActive() then
         local currentDNDState = self._activeDrag.info.wtReacting:DNDGetState()
 
@@ -861,7 +837,7 @@ function DnDManager:_HandlePosConverterChanged()
             
             info.wtMovable:SetPlacementPlain( correctedPlace )
             
-            info.initialPlacement = self:_CopyPlacement( currentPlace )
+            info.initialPlacement = table.sclone( currentPlace )
         end
     end
 end
@@ -875,7 +851,10 @@ end
 --------------------------------------------------------------------------------
 function DnDManager:_SaveConfig( name, value )
 	local config = self._options.configProvider.get() or {}
+    
 	config[ name ] = value
+    config.DnD_CONFIG_VERSION = self.__CONFIG_VERSION
+    
     self._options.configProvider.set( config )
 end
 
@@ -887,6 +866,10 @@ end
 --------------------------------------------------------------------------------
 function DnDManager:_LoadConfig( info )
 	local config = self._options.configProvider.get() or {}
+    
+    if self.__CONFIG_VERSION ~= config.DnD_CONFIG_VERSION then
+        return
+    end
     
     config = config[ info.configName ]
 
@@ -926,23 +909,4 @@ function DnDManager:_GetWidgetTreePath( wtWidget )
     end
     
     return table.concat( components, '.' )
-end
-
-
-
---------------------------------------------------------------------------------
---- Копирование таблицы координат ( Placement )
---- @param plc table Параметры Placement
---------------------------------------------------------------------------------
-function DnDManager:_CopyPlacement( plc )
-    return {
-        posX = plc.posX,
-        posY = plc.posY,
-        highPosX = plc.highPosX,
-        highPosY = plc.highPosY,
-        sizeX = plc.sizeX,
-        sizeY = plc.sizeY,
-        alignX = plc.alignX,
-        alignY = plc.alignY
-    }
 end
