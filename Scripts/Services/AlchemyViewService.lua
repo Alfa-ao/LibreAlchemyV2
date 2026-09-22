@@ -12,8 +12,7 @@ Class( "AlchemyViewService" )
 function AlchemyViewService:Init( context )
     self._alchemy = context.alchemy
     self._textContainer = context.textContainer
-    self._locale = context.locale
-    self._template = context.template
+    self._state = context.state
 end
 
 --------------------------------------------------------------------------------
@@ -22,9 +21,9 @@ end
 --------------------------------------------------------------------------------
 function AlchemyViewService:ShowGreetings( messageType )
     if messageType == CONFIG.MESSAGE_WELCOME_BACK then
-        self._textContainer:SetLines( self._locale:Get( "WELCOME_BACK" ) )
+        self._textContainer:SetLines( GetAddonText( self._state.localization, "WELCOME_BACK" ) )
     elseif messageType == CONFIG.MESSAGE_GREETINGS then
-        self._textContainer:SetLines( self._locale:Get( "GREETINGS" ) )
+        self._textContainer:SetLines( GetAddonText( self._state.localization, "GREETINGS" ) )
     end
 end
 
@@ -36,14 +35,14 @@ end
 function AlchemyViewService:ShowPotentialRecipes( countRecipe, filledSlotsCount )
     if countRecipe > 0 then
         local vtCountRecipes = common.CreateValuedText {
-            format = self._locale:Get( "COUNT_RECIPES" ),
+            format = GetAddonText( self._state.localization, "COUNT_RECIPES" ),
             count  = countRecipe,
         }
         self._textContainer:SetLines( vtCountRecipes )
     elseif filledSlotsCount > 0 then
-        self._textContainer:SetLines( self._locale:Get( "COMPONENTS_NOT_READY" ) )
+        self._textContainer:SetLines( GetAddonText( self._state.localization, "COMPONENTS_NOT_READY" ) )
     else
-        self._textContainer:SetLines( self._locale:Get( "NOT_FOUND_RECIPES" ) )
+        self._textContainer:SetLines( GetAddonText( self._state.localization, "NOT_FOUND_RECIPES" ) )
     end
 end
 
@@ -55,7 +54,7 @@ end
 --------------------------------------------------------------------------------
 function AlchemyViewService:ShowReactionResults( foundResults, maxDisplay, drumsCount )
     if #foundResults == 0 then
-        self._textContainer:SetLines( self._locale:Get( "RESULT_GIBBERISH" ) )
+        self._textContainer:SetLines( GetAddonText( self._state.localization, "RESULT_GIBBERISH" ) )
     else
         local linesData = self:FormatResults( foundResults, maxDisplay, drumsCount )
         self._textContainer:SetLines( table.unpack( linesData ) )
@@ -66,7 +65,7 @@ end
 --- Показывает поздравление с изменением списка рецептов.
 --------------------------------------------------------------------------------
 function AlchemyViewService:ShowCongratulation()
-    self._textContainer:SetLines( self._locale:Get( "CONGRATULATION" ) )
+    self._textContainer:SetLines( GetAddonText( self._state.localization, "CONGRATULATION" ) )
 end
 
 --------------------------------------------------------------------------------
@@ -76,7 +75,7 @@ end
 --------------------------------------------------------------------------------
 function AlchemyViewService:ShowItemTaken( potionName, count )
     local vtItem = common.CreateValuedText {
-        format = self._locale:Get( "AVATAR_ITEM_TAKEN" ),
+        format = GetAddonText( self._state.localization, "AVATAR_ITEM_TAKEN" ),
         name   = potionName,
         count  = count,
         class1 = "alchemy-yellow-text",
@@ -105,7 +104,7 @@ function AlchemyViewService:FormatResults( found, maxDisplay, drumsCount )
     -- Имя текущего зелья
     local currentRecipeName = self._alchemy:GetCurrentRecipeName()
 	-- Шаблон строки рецепта "level:N |N |N |N |N - name"
-    local recipeLineFormat = self._template:Get( "RECIPE_LINE" )
+    local recipeLineFormat = GetAddonText( "template", "RECIPE_LINE" )
 	-- Создание строк для ТОП-N рецептов
 	local linesData = {}
     for i = 1, math.min( #found, maxDisplay ) do
@@ -119,7 +118,7 @@ function AlchemyViewService:FormatResults( found, maxDisplay, drumsCount )
         }
         
         for drumIndex = 1, drumsCount do
-			-- Форматирует сдвиг для отображения "% d" = " 1" or "-1". Функция не умеет работать с подобными форматами:
+			-- Форматируется сдвиг для отображения "% d" = " 1" or "-1". Функция не умеет работать с подобными форматами:
             -- common.FormatInt( -foundResult.shifts[ drumIndex ], "% d" )
             -- Бьётся: "UI::LuaCommonFormatInt: РфQx"
             textValues[ "bulb" .. drumIndex ] = userMods.ToWString( string.format( "% d", -foundResult.shifts[ drumIndex ] ) )
@@ -127,7 +126,7 @@ function AlchemyViewService:FormatResults( found, maxDisplay, drumsCount )
 		
         table.insert( linesData, common.CreateValuedText( textValues ) )
     end
-
+    
     return linesData
 end
 

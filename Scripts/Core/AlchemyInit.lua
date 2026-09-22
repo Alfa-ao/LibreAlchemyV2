@@ -17,20 +17,15 @@ end
 -- State кэши рецептов и т.д.
 local state = AlchemyState { messageType = CONFIG.MESSAGE_GREETINGS }
 
+-- Локализация (rus, eng)
+state.localization = common.GetLocalization()
+
 --------------------------------------------------------------------------------
 -- Сервисы.
 --------------------------------------------------------------------------------
 -- Сервис лога. Включает вывод определенных категорий, чтобы не засорять mods.txt.
 local debugService = DebugService()
 debugService:Init { GENERAL = CONFIG.DEBUG, REACTION = CONFIG.DEBUG_REACTION }
-
--- Сервис локализации (rus, eng).
-local localeService = AlchemyRelatedTextService()
-localeService:Init( common.GetLocalization() )
-
--- Сервис шаблонов. Забирает XHTML-разметку из отдельной папки template.
-local templateService = AlchemyRelatedTextService()
-templateService:Init( "template" )
 
 -- Сервис для работы с рецептами. При первом открытии алхимки он запрашивает у игры все (250+) доступных рецептов, сохраняет их в кэш.
 local recipeService = AlchemyRecipeService()
@@ -75,8 +70,7 @@ local viewService = AlchemyViewService()
 viewService:Init {
     alchemy = widgetAlchemyV2,
     textContainer = widgetTextContainer,
-    locale = localeService,
-    template = templateService,
+    state = state,
 }
 
 --------------------------------------------------------------------------------

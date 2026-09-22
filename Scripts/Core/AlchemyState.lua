@@ -8,6 +8,7 @@ Class( "AlchemyState", {
     active = false,             -- boolean - Активно ли окно алхимии.
     reactionSuccess = false,    -- boolean - Была ли реакция успешной (найден рецепт).
     messageType = 0,            -- number (int) - Тип отображаемого сообщения (см. AlchemyConfig.MESSAGE_*).
+    localization = nil,         -- Локализация (rus, eng) common.GetLocalization.
 
     -- Кэш данных и результаты поиска
     recipeCache = nil,          -- ?table - Кэш списка всех доступных игроку рецептов алхимии.
