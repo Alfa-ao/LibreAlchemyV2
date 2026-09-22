@@ -12,9 +12,7 @@ Global( "log", function( ... )
     if VAR_DUMP_EXISTS then
         var_dump( ... )
     else
-        for _, value in ipairs { ... } do
-            common.LogInfo( "common", tostring(value) )
-        end
+        LogInfo( ... )
     end
 end )
 
