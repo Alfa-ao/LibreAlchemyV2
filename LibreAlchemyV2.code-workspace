@@ -5,9 +5,19 @@
 		},
 		{
 			"path": "Z:/AllodsLogs/"
+		},
+		{
+			"path": "A:/Games/Аллоды Онлайн/data/Mods/SampleCommon/CoreScripts"
 		}
 	],
 	"settings": {
-		"files.autoGuessEncoding": false
+		"files.autoGuessEncoding": true,
+		"Lua.diagnostics.disable": [
+			"undefined-global",
+			"undefined-field",
+			"lowercase-global",
+			"undefined-doc-name"
+		],
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	}
 }
