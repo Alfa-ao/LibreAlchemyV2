@@ -5,9 +5,7 @@
 -- имеющимся компонентам и подсчет возможных рецептов.
 --------------------------------------------------------------------------------
 
-Class( "AlchemyRecipeService", {
-	_state = nil, -- AlchemyState.
-} )
+Class( "AlchemyRecipeService" )
 
 --------------------------------------------------------------------------------
 --- Инициализация сервиса.
@@ -219,8 +217,8 @@ function AlchemyRecipeService:IsRecipeMatch( recipe, availableComponents, filled
 		["componentsCount"] => number(5)
 		["name"] => WString(19) "Мастеровой кристалл"
 		["requiredComponents"] => table(2) {
-			[Астральность] => number(3)
-			[Царственность] => number(2)
+			[Астральность(ComponentPropertyId)] => number(3)
+			[Царственность(ComponentPropertyId)] => number(2)
 		}
 		["score"] => number(116)
 	}
@@ -310,21 +308,11 @@ function AlchemyRecipeService:CountPotential() -- ФУНКЦИЯ провере�
 	--log(availableComponents)
 	--[[ 
 	table(5) {
-		[Астральность] => number(3)
-		[Биоморфичность] => number(5)
-		[Призрачность] => number(2)
-		[Технологичность] => number(3)
-		[Царственность] => number(2)
-	}
-	
-	переделано на:
-	
-	table(5) {
-		[userdata: 0x44281800] => number(2)
-		[userdata: 0x44281088] => number(5)
-		[userdata: 0x44280e78] => number(3)
-		[userdata: 0x442817c0] => number(2)
-		[userdata: 0x44280ef8] => number(3)
+		[Астральность(ComponentPropertyId)] => number(3)
+		[Биоморфичность(ComponentPropertyId)] => number(5)
+		[Призрачность(ComponentPropertyId)] => number(2)
+		[Технологичность(ComponentPropertyId)] => number(3)
+		[Царственность(ComponentPropertyId)] => number(2)
 	}
 	 ]]
 	-- Проверяет, сколько рецептов из кэша удовлетворяют собранному набору

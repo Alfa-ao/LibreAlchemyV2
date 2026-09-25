@@ -1,13 +1,11 @@
 --------------------------------------------------------------------------------
 -- Scripts/Services/AlchemySearchService.lua
--- Сервис для поиска оптимальных рецептов алхимии.
+-- Сервис для поиска оптимальных комбинаций рецептов алхимии.
 --------------------------------------------------------------------------------
 
 Class( "AlchemySearchService" )
 
 --------------------------------------------------------------------------------
---- Инициализация сервиса поиска.
---- Проверяет, что переданный алгоритм реализует требуемый интерфейс.
 --- @param state table AlchemyState Ссылка на глобальное состояние аддона.
 --- @param recipeService table AlchemyRecipeService Сервис для работы с рецептами (кэширование и фильтрация).
 --- @param mapper table DrumShiftMapper Маппер сдвигов барабанов.
@@ -22,10 +20,8 @@ function AlchemySearchService:Init( state, recipeService, mapper, algorithm )
 end
 
 --------------------------------------------------------------------------------
---- Главная точка входа для поиска лучших рецептов.
---- Собирает данные, строит карту сдвигов, фильтрует рецепты
---- и запускает алгоритм поиска для нахождения оптимальных комбинаций.
---- @return table -- найдено список рецептов
+--- Собирает данные, строит карту сдвигов, фильтрует рецепты и запускает алгоритм поиска для нахождения оптимальных комбинаций.
+--- @return table foundResults найдено список рецептов
 --------------------------------------------------------------------------------
 function AlchemySearchService:FindBestRecipes()
 	local alchemyInfo = avatar.GetAlchemyInfo()
@@ -53,11 +49,11 @@ function AlchemySearchService:FindBestRecipes()
 	--log(drumRequiredComponents, totalDrumsCount)
 	--[[ 
 	table(5) {
-		[Аспект акробата] => number(1)
-		[Время] => number(1)
-		[Звериное чутьё] => number(1)
-		[Исцеление] => number(1)
-		[Ослепление] => number(1)
+		[Аспект акробата(ComponentPropertyId)] => number(1)
+		[Время(ComponentPropertyId)] => number(1)
+		[Звериное чутьё(ComponentPropertyId)] => number(1)
+		[Исцеление(ComponentPropertyId)] => number(1)
+		[Ослепление(ComponentPropertyId)] => number(1)
 	}
 	----------------------
 	number(2)
@@ -76,8 +72,8 @@ function AlchemySearchService:FindBestRecipes()
                 ["componentsCount"] => number(5)
                 ["name"] => WString(19) "Мастеровой кристалл"
                 ["requiredComponents"] => table(2) {
-                    [Астральность] => number(3)
-                    [Царственность] => number(2)
+                    [Астральность(ComponentPropertyId)] => number(3)
+                    [Царственность(ComponentPropertyId)] => number(2)
                 }
                 ["score"] => number(116)
             }
