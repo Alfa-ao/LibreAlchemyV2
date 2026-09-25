@@ -4,22 +4,14 @@
 --------------------------------------------------------------------------------
 
 Class( "WidgetTextContainer", {
-    _wtParent  = nil,
     _wtTextContainer = nil,
-    _options  = nil,
 } )
 
 --------------------------------------------------------------------------------
---- Инициализация сервиса.
+--- Инициализация.
 --------------------------------------------------------------------------------
-function WidgetTextContainer:Init( params )
-    params = type( params ) == "table" and params or {}
-    
+function WidgetTextContainer:Init()
     self._wtParent = self._wtTextContainer:GetParent()
-    
-    self._options = {
-        sizePadding = type( params.sizePadding ) == "number" and params.sizePadding > 1 and params.sizePadding or 15
-    }
 end
 
 --------------------------------------------------------------------------------
@@ -46,17 +38,19 @@ end
 function WidgetTextContainer:UpdateSizePanel( textHeight )
     -- Новый отступ от Panel для ouText
     local ouTextPlc = self._wtTextContainer:GetPlacementPlain()
-    ouTextPlc.posX = self._options.sizePadding
-    ouTextPlc.posY = self._options.sizePadding
+    ouTextPlc.posX = CONFIG.GUI.PADDING
+    ouTextPlc.posY = CONFIG.GUI.PADDING
     self._wtTextContainer:SetPlacementPlain( ouTextPlc )
     
     -- Ширина: отступ слева (posX) и справа + фиксированная ширина текста
-    local targetSizeX = self._options.sizePadding * 2 + ouTextPlc.sizeX
+    local targetSizeX = CONFIG.GUI.PADDING * 2 + ouTextPlc.sizeX
     -- Высота: отступ сверху (posY) и снизу + высота текста
-    local targetSizeY = self._options.sizePadding * 2 + textHeight
+    local targetSizeY = CONFIG.GUI.PADDING * 2 + textHeight
 
     -- Новый размер для Panel
     local panelPlc = self._wtParent:GetPlacementPlain()
+    -- Позицирование от центра: окно смещается вниз от центра Y
+    panelPlc.posY = panelPlc.posY - panelPlc.sizeY / 2 + targetSizeY / 2
     panelPlc.sizeX = targetSizeX
     panelPlc.sizeY = targetSizeY
     self._wtParent:SetPlacementPlain( panelPlc )
@@ -81,12 +75,9 @@ end
 function WidgetTextContainer:UpdateCenterPanel()
     local pco = common.GetPosConverterParams()
     local plc = self._wtParent:GetPlacementPlain()
-
-    -- Центрируем панель по горизонтали
-    plc.posX = pco.fullVirtualSizeX / 2 - CONFIG.GUI.PANEL_HALF_WIDTH - CONFIG.GUI.PANEL_OFFSET_X
-    -- Инвертируем координату Y для корректного отображения относительно верха экрана
-    -- Подробности: https://github.com/Alfa-ao/LibreAlchemyV2/issues/1
-    plc.posY = pco.fullVirtualSizeY - plc.posY -- Переделать потом на основании окна алхимки
-
+    
+    plc.posX = CONFIG.GUI.POS_X
+    plc.posY = CONFIG.GUI.SIZE_Y / 2 + plc.sizeY / 2
+    
     self._wtParent:SetPlacementPlain( plc )
 end

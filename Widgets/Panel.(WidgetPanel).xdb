@@ -8,17 +8,20 @@
     <BackLayer href="Text/Textures/Tooltip.(WidgetLayerTiledTexture).xdb" />
     <Placement>
         <X>
+            <Align>WIDGET_ALIGN_CENTER</Align>
             <Sizing>WIDGET_SIZING_DEFAULT</Sizing>
-            <Size>600</Size> <!-- Начальный размер, потом пересчитаем в Lua -->
+            <Size>100</Size>
+            <Pos>0</Pos>
         </X>
         <Y>
+            <Align>WIDGET_ALIGN_CENTER</Align>
             <Sizing>WIDGET_SIZING_DEFAULT</Sizing>
-            <Size>100</Size> <!-- Начальный размер, потом пересчитаем в Lua -->
-            <Pos>160</Pos> <!-- Начальный отступ, потом пересчитаем в Lua -->
+            <Size>100</Size>
+            <Pos>0</Pos>
         </Y>
     </Placement>
     <Visible>true</Visible>
 	<Enabled>true</Enabled>
-	<PickChildrenOnly>false</PickChildrenOnly> <!-- Блокируем -->
+	<PickChildrenOnly>false</PickChildrenOnly>
 	<TransparentInput>false</TransparentInput>
 </WidgetPanel>

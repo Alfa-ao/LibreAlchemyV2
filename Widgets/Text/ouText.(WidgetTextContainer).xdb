@@ -6,13 +6,14 @@
 	<defaultTag>text</defaultTag>
 	<Placement>
 		<X>
+			<Align>WIDGET_ALIGN_LOW</Align>
 			<Sizing>WIDGET_SIZING_DEFAULT</Sizing>
-            <Size>570</Size>
+            <Size>533</Size>
 			<Pos>15</Pos>
 		</X>
 		<Y>
-			<!-- Авторесайзинг по Y -->
-			<Sizing>WIDGET_SIZING_INTERNAL</Sizing>
+			<Align>WIDGET_ALIGN_LOW</Align>
+			<Sizing>WIDGET_SIZING_INTERNAL</Sizing><!-- Авторесайзинг по Y -->
 			<Pos>15</Pos>
 		</Y>
 	</Placement>

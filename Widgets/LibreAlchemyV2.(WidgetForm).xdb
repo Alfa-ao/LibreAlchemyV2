@@ -6,10 +6,6 @@
 		<Item href="Panel.(WidgetPanel).xdb" />
 	</Children>
 	<Placement>
-		<!-- 
-			WIDGET_ALIGN_BOTH - растягивает на весь размер экрана.
-			Drag&Drop реализация перетаскивания по внутренней области.
-		-->
 		<X>
 			<Align>WIDGET_ALIGN_BOTH</Align>
 		</X>
