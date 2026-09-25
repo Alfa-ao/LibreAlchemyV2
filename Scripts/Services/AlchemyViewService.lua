@@ -1,12 +1,11 @@
 --------------------------------------------------------------------------------
 -- Services/AlchemyViewService.lua
--- Сервис для управления отображением UI (View слой).
--- Отвечает за форматирование и вывод сообщений в текстовый контейнер.
+-- Сервис для управления GUI (View слой).
+-- Форматирует и выводит сообщения в текстовый контейнер.
 --------------------------------------------------------------------------------
 Class( "AlchemyViewService" )
 
 --------------------------------------------------------------------------------
---- Инициализация сервиса.
 --- @param context table
 --------------------------------------------------------------------------------
 function AlchemyViewService:Init( context )
@@ -85,7 +84,7 @@ function AlchemyViewService:ShowItemTaken( potionName, count )
 end
 
 --------------------------------------------------------------------------------
---- Отформатировать список найденных рецептов в массив объектов ValuedText.
+--- Форматируется список найденных рецептов в общий ValuedText.
 --- Результаты сортируются по убыванию уровня умения (score), при равенстве: по имени.
 --- @param found table массив найденных результатов (см. AlchemySearchService:FindBestRecipes).
 --- @param maxDisplay number максимальное количество строк для отображения (ТОП-N).
@@ -103,7 +102,7 @@ function AlchemyViewService:FormatResults( found, maxDisplay, drumsCount )
 	
     -- Имя текущего зелья
     local currentRecipeName = self._alchemy:GetCurrentRecipeName()
-	-- Шаблон строки рецепта "level:N |N |N |N |N - name"
+	-- Шаблон строки рецепта "level: N |N |N |N |N - name"
     local recipeLineFormat = GetAddonText( "template", "RECIPE_LINE" )
 	-- Создание строк для ТОП-N рецептов
 	local linesData = {}
@@ -131,8 +130,8 @@ function AlchemyViewService:FormatResults( found, maxDisplay, drumsCount )
 end
 
 --------------------------------------------------------------------------------
---- Формат записи: score,shift1,shift2,shift3,shift4,shift5,name|score,shift1,...
---- EVENT_ALCHEMY_REACTION_FINISHED:123,1,-1,0,0,0,зелье|123,...
+--- Тоже самое что и FormatResults, но для дебага.
+--- Формат записи: EVENT_ALCHEMY_REACTION_FINISHED:123,1,-1,0,0,0,зелье|123,...
 --- @param found table массив найденных результатов (recipe и shifts).
 --- @param maxDisplay number максимальное количество строк для отображения (ТОП-N).
 --- @param drumsCount number количество барабанов (для вывода сдвигов).
