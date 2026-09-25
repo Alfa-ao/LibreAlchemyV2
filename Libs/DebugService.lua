@@ -63,6 +63,8 @@ function DebugService:Log( category, ... )
 			args[i] = string.format( "WString( %s )", userMods.FromWString( v ) )
 		elseif not VAR_DUMP_EXISTS then
 			args[i] = tostring( v )
+		else
+			args[i] = v
 		end
 	end
 	
