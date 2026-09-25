@@ -38,12 +38,14 @@ end
 --- Обработчик события EVENT_AVATAR_ITEM_TAKEN.
 --- Срабатывает при получении предмета. Если это действие (крафта),
 --- и реакция была успешной, выводит поздравление с названием и количеством зелий.
---- @param params table { actionType: string, itemObject: ValuedObject }
+--- @param params table { actionType: string, itemObject: ValuedObjectLua }
 --------------------------------------------------------------------------------
 function AlchemyAvatarEvents:OnItemTaken( params )
-    ----------------------------------------
-    self._debug:LogGeneral( "EVENT_AVATAR_ITEM_TAKEN", params.actionType, params.itemObject )
-    ----------------------------------------
+    -----------------DEBUG------------------
+    self._debug:LogGeneral( "EVENT_AVATAR_ITEM_TAKEN", { 
+        "params: { actionType: string, itemObject: ValuedObjectLua }", params 
+    } )
+    ------------------END-------------------
     
     if params.actionType == EnumTakeItemActionType.CRAFT and self._state.reactionSuccess then
         -- Информация о созданном предмете по его ID.

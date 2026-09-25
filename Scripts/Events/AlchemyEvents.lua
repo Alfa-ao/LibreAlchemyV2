@@ -32,9 +32,9 @@ function AlchemyEvents:_ScheduleResetMessageType()
     self._state.taskRefs.funcResetMessageType = common.DelayedCall( CONFIG.DELAY_MS_UPDATE, function()
         self._state.messageType = CONFIG.MESSAGE_NORMAL
         self._state.taskRefs.funcResetMessageType = nil
-        ----------------------------------------
+        -----------------DEBUG------------------
         self._debug:LogGeneral( "MESSAGE_TYPE change to default: <MESSAGE_NORMAL>" )
-        ----------------------------------------
+        ------------------END-------------------
     end )
 end
 
@@ -43,10 +43,6 @@ end
 -- Срабатывает при открытии окна алхимии.
 --------------------------------------------------------------------------------
 function AlchemyEvents:OnStarted()
-    ----------------------------------------
-    self._debug:LogGeneral( "EVENT_ALCHEMY_STARTED" )
-    ----------------------------------------
-    
     _G.mainForm:Show( true )
     self._state.active = true
 
@@ -55,9 +51,9 @@ function AlchemyEvents:OnStarted()
 
     -- Выводит HELLO сообщение в зависимости от предыдущего состояния
     self._view:ShowGreetings( self._state.messageType )
-    ----------------------------------------
-    self._debug:LogGeneral( "ShowGreetings:", self._state.messageType )
-    ----------------------------------------
+    -----------------DEBUG------------------
+    self._debug:LogGeneral( "EVENT_ALCHEMY_STARTED", { "ShowGreetings:", self._state.messageType } )
+    ------------------END-------------------
     
     -- Запланировать возврат к MESSAGE_NORMAL режиму
     self:_ScheduleResetMessageType()
@@ -74,7 +70,7 @@ function AlchemyEvents:OnCanceled( params )
     self._state:ResetPlace() -- Сбрасывает состояние слотов
     
     -- Fix: 17.0.01.37 isSuccess (number(0/1))
-    if params.isSuccess == false or params.isSuccess == 0 or params.isSuccess == nil then
+    if not params.isSuccess or params.isSuccess == 0 then
         _G.mainForm:Show( false )
         self._state:ResetActive() -- Сброс состояния при закрытии алхимки.
         
@@ -82,15 +78,13 @@ function AlchemyEvents:OnCanceled( params )
         self._state.messageType = CONFIG.MESSAGE_WELCOME_BACK
     end
     
-    ----------------------------------------
+    -----------------DEBUG------------------
     self._debug:LogGeneral(
         "EVENT_ALCHEMY_CANCELED",
-        "isSuccess:",
-        params.isSuccess,
-        "Count place:",
-        self._state.place.count
+        { "params: { isSuccess: boolean }", params },
+        { "Count place:", self._state.place.count }
     )
-    ----------------------------------------
+    ------------------END-------------------
 end
 
 --------------------------------------------------------------------------------
@@ -99,16 +93,6 @@ end
 --- @param params table { placed: boolean, slot: number }
 --------------------------------------------------------------------------------
 function AlchemyEvents:OnItemPlaced( params )
-    ----------------------------------------
-    self._debug:LogGeneral( "EVENT_ALCHEMY_ITEM_PLACED", function ()
-        if params.placed then
-            return "DEBUG_INSERT_BAR"
-        end
-        
-        return "DEBUG_REMOVED_BAR"
-    end, "slot:", params.slot, "placed:", params.placed )
-    ----------------------------------------
-    
     -- Обновляет состояние слотов
     self._state.place.placed = params.placed
 
@@ -121,9 +105,17 @@ function AlchemyEvents:OnItemPlaced( params )
         self._state.place.count = self._state.place.count - 1
     end
     
-    ----------------------------------------
-    self._debug:LogGeneral( "Count place:", self._state.place.count )
-    ----------------------------------------
+    -----------------DEBUG------------------
+    self._debug:LogGeneral( 
+        "EVENT_ALCHEMY_ITEM_PLACED",
+        function ()
+            if params.placed then return "DEBUG_INSERT_BAR" end
+            return "DEBUG_REMOVED_BAR"
+        end, 
+        { "params: { placed: boolean, slot: number }", params },
+        { "Count place:", self._state.place.count }
+    )
+    ------------------END-------------------
     
     -- Если сейчас не стандартный режим отображения, текст не обновляется.
     -- Автоматически переключится.
@@ -141,9 +133,9 @@ function AlchemyEvents:OnItemPlaced( params )
             local countRecipe, filledDrumsCount = self._recipe:CountPotential()
             
             self._view:ShowPotentialRecipes( countRecipe, filledDrumsCount )
-            ----------------------------------------
-            self._debug:LogGeneral( "ShowPotentialRecipes:", countRecipe )
-            ----------------------------------------
+            -----------------DEBUG------------------
+            self._debug:LogGeneral( { "ShowPotentialRecipes:", countRecipe } )
+            ------------------END-------------------
         end
     end
     
@@ -161,27 +153,22 @@ end
 -- Срабатывает сразу после начала процесса варки (нажатие кнопки "варить").
 --------------------------------------------------------------------------------
 function AlchemyEvents:OnReactionFinished()
-    ----------------------------------------
-    self._debug:LogGeneral( "EVENT_ALCHEMY_REACTION_FINISHED" )
-    ----------------------------------------
-    
     -- Запускает алгоритм поиска подходящих рецептов
     local found = self._search:FindBestRecipes()
     self._view:ShowReactionResults( found, CONFIG.MAX_DISPLAY_RESULTS, self._state.drumsCount )
     
     -- Если ничего не найдено
     if #found == 0 then
-        ----------------------------------------
+        -----------------DEBUG------------------
         self._debug:LogReaction( "EVENT_ALCHEMY_REACTION_FINISHED:{empty}" )
-        ----------------------------------------
+        ------------------END-------------------
         self._state:InvalidateReaction()
     else
-        ----------------------------------------
-        -- Log: EVENT_ALCHEMY_REACTION_FINISHED:123,1,-1,0,0,0,зелье|123,...
+        -----------------DEBUG------------------
         self._debug:LogReaction( function()
             return self._view:ResultsForLog( found, CONFIG.MAX_DISPLAY_RESULTS, self._state.drumsCount )
         end )
-        ----------------------------------------
+        ------------------END-------------------
         -- Присваивается метка реакции как успешная (чтобы при получении предмета показать поздравление с кол-вом полученного предмета)
         self._state.reactionSuccess = true
     end
@@ -192,9 +179,9 @@ end
 -- Срабатывает, когда список рецептов изменился.
 --------------------------------------------------------------------------------
 function AlchemyEvents:OnRecipesChanged()
-    ----------------------------------------
+    -----------------DEBUG------------------
     self._debug:LogGeneral( "EVENT_ALCHEMY_RECIPES_CHANGED" )
-    ----------------------------------------
+    ------------------END-------------------
     
     -- Сбрасывает кэш рецептов для обновления
     self._state:ResetRecipeCache()
