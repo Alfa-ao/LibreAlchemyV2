@@ -1,8 +1,66 @@
 --------------------------------------------------------------------------------
 -- src/DnDManager.lua
 -- ООП менеджер Drag & Drop для виджетов.
--- Требует зависимость: "/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua"
+-- Требует зависимость: 
+--[[
+<ScriptFileRefs>
+    <Item href="/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua" />
+    <Item href="/Mods/SampleCommon/CoreScripts/AddonBaseUserMods.lua" />
+    <Item href="/Mods/SampleCommon/CoreScripts/AddonBase.lua" />
+    <Item href="/Mods/SampleCommon/CoreScripts/WidgetCoreUserMods.lua" />
+    <Item href="/Mods/SampleCommon/CoreScripts/AdvancedHandlersUserMods.lua" />
+</ScriptFileRefs>
+]]
 --------------------------------------------------------------------------------
+--[[ 
+
+Таблица из метода wtMovable:GetPlacementPlain():
+table(WidgetPlacementLua:10) {
+    -- Тип выравнивания.
+    -- Значения: number (WIDGET_ALIGN_LOW(0) | WIDGET_ALIGN_HIGH(1) | WIDGET_ALIGN_CENTER(2) | WIDGET_ALIGN_BOTH(3) | WIDGET_ALIGN_LOW_ABS(4))
+    -- По умолчанию (alignX / alignY): number(WIDGET_ALIGN_LOW(0)) 
+    ["alignX"] => number(WIDGET_ALIGN_LOW(0)) 
+    ["alignY"] => number(WIDGET_ALIGN_LOW(0))
+    
+    -- Смещение относительно родителя (или ребенка при WIDGET_SIZING_CHILDREN) по ПРАВОМУ / НИЖНЕМУ краю.
+    -- Значения: number (float)
+    -- Смещение (highPosX / highPosY) действует только при значении (alignX / alignY): WIDGET_ALIGN_HIGH(1) или WIDGET_ALIGN_BOTH(3)
+    -- По умолчанию (highPosX / highPosY): number(0)
+    ["highPosX"] => number(0)
+    ["highPosY"] => number(0)
+    
+    -- Смещение относительно родителя (или ребенка при WIDGET_SIZING_CHILDREN) по ЛЕВОМУ / ВЕРХНЕМУ краю.
+    -- Значения: number (float)
+    -- Игнорируется при выравнивании (alignX / alignY): WIDGET_ALIGN_HIGH(1)
+    -- По умолчанию (posX / posY): number(0)
+    ["posX"] => number(0)
+    ["posY"] => number(0)
+    
+    -- Размер ширины и высоты виджета.
+    -- Значения: number (float)
+    -- Игнорируется при выравнивании (alignX / alignY): WIDGET_ALIGN_BOTH(3)
+    -- Игнорируется при масштабировании (sizingX / sizingY): WIDGET_SIZING_INTERNAL(1) или WIDGET_SIZING_CHILDREN(2)
+    -- По умолчанию (sizeX / sizeY): number(0)
+    ["sizeX"] => number(0)
+    ["sizeY"] => number(0)
+    
+    -- Тип масштабирования.
+    -- Значения: number (WIDGET_SIZING_DEFAULT(0) | WIDGET_SIZING_INTERNAL(1) | WIDGET_SIZING_CHILDREN(2))
+    -- По умолчанию (sizingX / sizingY): number (WIDGET_SIZING_DEFAULT(0))
+    ["sizingX"] => number(WIDGET_SIZING_DEFAULT(0))
+    ["sizingY"] => number(WIDGET_SIZING_DEFAULT(0))
+}
+
+Таблица из функции common.GetPosConverterParams():
+table(6) {
+    ["fullVirtualSizeX"] => number(1920) - динамично по размеру экрана
+    ["fullVirtualSizeY"] => number(1080) - динамично по размеру экрана
+    ["realSizeX"] => number(777) - Размер окна реальный в пикселях
+    ["realSizeY"] => number(777) - Размер окна реальный в пикселях
+    ["referenceVirtualSizeX"] => number(1920) - эталон
+    ["referenceVirtualSizeY"] => number(1080) - эталон
+}
+ ]]
 
 --- @class DnDManager
 --- @field _widgets table Хранилище зарегистрированных виджетов [ dndId ] = WidgetInfo
@@ -10,7 +68,7 @@
 --- @field _eventHandlers table Ссылки на коллбэки для отписки от событий
 --- @field _screenParams table Кэш параметров координат (разрешение экрана)
 Class( "DnDManager", {
-    __CONFIG_VERSION = "1.0.0",
+    __CONFIG_VERSION = "1.0.0-original",
     _opposite = {
         posX = "highPosX",
         posY = "highPosY",
@@ -145,9 +203,6 @@ function DnDManager:Register( wtMovable, options )
         info.configName = "DnD:" .. self:_GetWidgetTreePath( wtMovable ) -- DnD:Main.Panel2
         self:_LoadConfig( info )
     end
-
-    -- Сохраняет начальное положение после применения конфига.
-    info.initialPlacement = wtMovable:GetPlacementPlain()
     
     local currentDNDState = options.wtReacting:DNDGetState()
     
@@ -340,10 +395,8 @@ function DnDManager:UnregisterAllEvents()
     if not self._eventHandlers then
         return
     end
-
-    for eventName, callback in pairs( self._eventHandlers ) do
-        common.UnRegisterEventHandler( callback, eventName )
-    end
+    
+    advEvent.UnRegisterEventHandlers( false, self._eventHandlers )
 
     self._eventHandlers = {}
 end
@@ -355,31 +408,30 @@ end
 --- Вызывается только если autoRegisterEvents == true.
 --------------------------------------------------------------------------------
 function DnDManager:_RegisterAllEvents()
-    self._eventHandlers = {}
+    self._eventHandlers = {
+        {
+            function( params ) self:OnPickAttempt( params ) end,
+            "EVENT_DND_PICK_ATTEMPT"
+        },
+        {
+            function( params ) self:OnDragTo( params ) end,
+            "EVENT_DND_DRAG_TO"
+        },
+        {
+            function( params ) self:OnDropAttempt( params ) end,
+            "EVENT_DND_DROP_ATTEMPT"
+        },
+        {
+            function() self:OnDragCancelled() end,
+            "EVENT_DND_DRAG_CANCELLED"
+        },
+        {
+            function() self:OnPosConverterChanged() end,
+            "EVENT_POS_CONVERTER_CHANGED"
+        },
+    }
 
-    self._eventHandlers[ "EVENT_DND_PICK_ATTEMPT" ] = function( params )
-        self:OnPickAttempt( params )
-    end
-
-    self._eventHandlers[ "EVENT_DND_DRAG_TO" ] = function( params )
-        self:OnDragTo( params )
-    end
-
-    self._eventHandlers[ "EVENT_DND_DROP_ATTEMPT" ] = function( params )
-        self:OnDropAttempt( params )
-    end
-
-    self._eventHandlers[ "EVENT_DND_DRAG_CANCELLED" ] = function()
-        self:OnDragCancelled()
-    end
-
-    self._eventHandlers[ "EVENT_POS_CONVERTER_CHANGED" ] = function()
-        self:OnPosConverterChanged()
-    end
-
-    for eventName, callback in pairs( self._eventHandlers ) do
-        common.RegisterEventHandler( callback, eventName )
-    end
+    advEvent.RegisterEventHandlers( false, self._eventHandlers )
 end
 
 
@@ -555,17 +607,8 @@ function DnDManager:_StopDragging( success )
         state.info.wtReacting:DNDConfirmDropAttempt()
 
         if state.info.saveToConfig then
-            local plc = state.currentPlacement
-            
-            self:_SaveConfig( state.info.configName, {
-                posX = plc.posX,
-                posY = plc.posY,
-                highPosX = plc.highPosX,
-                highPosY = plc.highPosY,
-            } )
+            self:_SaveConfig( state.info.configName, state.currentPlacement )
         end
-
-        state.info.initialPlacement = table.sclone( state.currentPlacement )
     else
         state.info.wtMovable:SetPlacementPlain( state.resetPlacement )
     end
@@ -745,6 +788,8 @@ function DnDManager:_NormalizePlacement( Place, limitMin, limitMax )
     return Place
 end
 
+
+
 --------------------------------------------------------------------------------
 --- Событие: Перемещение курсора во время перетаскивания
 --- Документация: EVENT_DND_DRAG_TO может прийти после окончания drag&drop.
@@ -765,7 +810,7 @@ function DnDManager:_HandleDragTo( params )
     local dy = params.posY - state.startMousePos.y
 
     local place = state.currentPlacement
-
+    
     if place.alignX ~= WIDGET_ALIGN_LOW_ABS then
         dx = dx * self._screenParams.fullVirtualSizeX / self._screenParams.realSizeX
     end
@@ -801,58 +846,39 @@ end
 --- Событие: Изменение разрешения экрана / масштаба
 --------------------------------------------------------------------------------
 function DnDManager:_HandlePosConverterChanged()
-    -- Если прямо сейчас что-то тащится, отменяется, иначе координаты улетят в космос
+    -- если прямо сейчас что-то тащится, стопорится.
     if self:IsDragActive() then
         local currentDNDState = self._activeDrag.info.wtReacting:DNDGetState()
-
         if currentDNDState ~= DND_STATE_NOT_REGISTERED then
             self._activeDrag.info.wtReacting:DNDCancelDrag()
         end
     end
     
     self:_StopDragging( false )
-
-    -- Обновить кэш экрана
+    
     self._screenParams = common.GetPosConverterParams()
-
-    -- Пересчитать границы и запихнуть все виджеты в новые рамки
+    
     for _, info in pairs( self._widgets ) do
-        if info.lockedToParentArea and info.initialPlacement then
-            -- Актуальный placement виджета.
-            local currentPlace = info.wtMovable:GetPlacementPlain()
-            
-            local limits = self:_PrepareLimits( info, currentPlace )
-            
-            -- Координаты из сохраненной позиции.
-            currentPlace.posX = info.initialPlacement.posX or currentPlace.posX
-            currentPlace.posY = info.initialPlacement.posY or currentPlace.posY
-            currentPlace.highPosX = info.initialPlacement.highPosX or currentPlace.highPosX
-            currentPlace.highPosY = info.initialPlacement.highPosY or currentPlace.highPosY
-            
-            local correctedPlace = self:_NormalizePlacement(
-                currentPlace,
-                limits.min,
-                limits.max
-            )
-            
-            info.wtMovable:SetPlacementPlain( correctedPlace )
-            
-            info.initialPlacement = table.sclone( currentPlace )
+        if info.lockedToParentArea then
+            local place = info.wtMovable:GetPlacementPlain()
+            local limits = self:_PrepareLimits( info, place )
+            place = self:_NormalizePlacement( place, limits.min, limits.max )
+            info.wtMovable:SetPlacementPlain( place )
         end
     end
 end
 
 
-
 --------------------------------------------------------------------------------
---- Сохранение значения в конфиг.
+--- Сохранение WidgetPlacementLua в конфиг.
 --- @param name string Имя ключа.
---- @param value any Значение.
+--- @param plc table WidgetPlacementLua.
 --------------------------------------------------------------------------------
-function DnDManager:_SaveConfig( name, value )
+function DnDManager:_SaveConfig( name, plc )
 	local config = self._options.configProvider.get() or {}
     
-	config[ name ] = value
+	config[ name ] = plc
+    
     config.DnD_CONFIG_VERSION = self.__CONFIG_VERSION
     
     self._options.configProvider.set( config )
@@ -861,7 +887,7 @@ end
 
 
 --------------------------------------------------------------------------------
---- Загрузка позиции из конфига.
+--- Загрузка WidgetPlacementLua из конфига.
 --- @param info table Информация о зарегистрированном виджете.
 --------------------------------------------------------------------------------
 function DnDManager:_LoadConfig( info )
@@ -876,14 +902,13 @@ function DnDManager:_LoadConfig( info )
     if not config or type( config ) ~= "table" then
         return
     end
-
+    
     local plc = info.wtMovable:GetPlacementPlain()
-
-    plc.posX = config.posX or plc.posX
-    plc.posY = config.posY or plc.posY
-    plc.highPosX = config.highPosX or plc.highPosX
-    plc.highPosY = config.highPosY or plc.highPosY
-
+    
+    for k, v in pairs( config ) do
+        plc[k] = v
+    end
+    
     if info.lockedToParentArea then
         local limits = self:_PrepareLimits( info, plc )
 
