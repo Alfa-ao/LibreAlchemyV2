@@ -7,7 +7,7 @@
 		<name href="AddonName.txt" />
 		<description href="AddonDescription.txt" />
 		<author>Alfa-ao</author>
-		<version>2.3.0</version>
+		<version>2.4.0</version>
 		<apiVersion>18000000</apiVersion>
 		<buildTime>0</buildTime>
 		<useCommonScripts>false</useCommonScripts>
@@ -24,7 +24,7 @@
 		<Item href="Scripts/Core/AlchemyState.lua" />
 		
 		<!-- Debug -->
-		<Item href="Libs/var_dump.lua" />
+		<!-- <Item href="Libs/var_dump.lua" /> -->
 		<Item href="Libs/DebugService.lua" />
 		
 		<!-- Enum -->
