@@ -2,6 +2,45 @@
 
 Все перечисленные изменения в релизе.
 
+
+
+## [v2.4.0](https://github.com/Alfa-ao/LibreAlchemyV2/releases/tag/v2.4.0)
+
+### Added
+
+- `Config.lua`
+    - Добавлена глобальная таблица `__CONFIG_VAR_DUMP` для настройки поведения `var_dump`.
+    - Добавлена опция `REQUIRED_COMPONENTS_COUNT` (по умолчанию `false`) - строгая проверка совпадения количества заполненных слотов с требуемым количеством компонентов рецепта.
+    - Добавлены параметры `GUI.POS_X`, `GUI.SIZE_X`, `GUI.SIZE_Y` для централизованного управления позицией и размерами панели подсказки.
+- В `AlchemyState` добавлены поля `localization` (локализация `rus`/`eng`) и `drumSize` (количество аспектов в одном барабане).
+
+### Changed
+
+- DnD `DnDManager`: Менеджер обновлён до версии `v1.2.0`.
+- События: переход с `common.RegisterEventHandler` на `advEvent.RegisterEventHandlers`. Формат таблицы событий изменён с `{ [eventName] = handler }` на массив `{ { handler, eventName }, ... }`.
+- Локализация: упразднён `AlchemyRelatedTextService`. Получение текстовых ресурсов теперь выполняется напрямую через глобальную функцию `GetAddonText( sysGroup, sysName, optional )`. Локализация сохраняется в `AlchemyState.localization` при инициализации.
+- Утилиты: упразднён `MathUtils`. `MathUtils.shallowCopy` заменён на встроенный `table.sclone`. `MathUtils.safeModulo` заменён на стандартный оператор `%` с использованием `drumSize` из состояния.
+- Рецепты `AlchemyRecipeService`: удалён кэш строковых имён компонентов `_componentNamesCache`, `GetComponentName`. Рецепты теперь хранят и сравнивают компоненты по `ComponentPropertyId` (userdata) напрямую, без конвертации в строку. Сохранение `drumSize` из `GetAlchemyInfo`. Метод `IsRecipeMatch` учитывает флаг `CONFIG.REQUIRED_COMPONENTS_COUNT`.
+- Поиск `DrumShiftMapper`: упрощена инициализация - убрана зависимость от `AlchemyRecipeService`. Карта сдвигов строится по `ComponentPropertyId` напрямую. Используется `state.drumSize` вместо `GetTableSize`.
+- Поиск `BacktrackingSearchAlgorithm`: `MathUtils.shallowCopy` заменён на `table.sclone`.
+- View `AlchemyViewService`: инициализация принимает `state` вместо отдельных `locale` и `template`. Все вызовы `self._locale:Get()` / `self._template:Get()` заменены на `GetAddonText()`.
+- GUI `WidgetTextContainer`: `Init()` больше не принимает параметров - отступ берётся из `CONFIG.GUI.PADDING`. `UpdateCenterPanel()` упрощён: позиция рассчитывается через `CONFIG.GUI.POS_X` и `CONFIG.GUI.SIZE_Y`.
+- Debug `DebugService`: улучшена обработка `WString` при отсутствии `var_dump` - используется `userMods.FromWString`. Глобальная функция `log` использует `LogInfo` вместо `common.LogInfo`.
+- `Panel.(WidgetPanel).xdb`: выравнивание изменено на `WIDGET_ALIGN_CENTER` по обеим осям, начальные размеры и позиции обнулены (управляются из Lua).
+- `ouText.(WidgetTextContainer).xdb`: ширина уменьшена с `570` до `533`.
+- `AddonDesc.(UIAddon).xdb`: подключены дополнительные CoreScripts (`AddonBaseUserMods`, `AddonBase`, `WidgetCoreUserMods`, `AdvancedHandlersUserMods`).
+- Позицирование: изменена логика позицирования виджета подсказки. Теперь корректно отображается при масштабировании.
+
+### Removed
+
+- Удалён файл `Libs/Utils/MathUtils.lua`.
+- Удалён файл `Scripts/Services/AlchemyRelatedTextService.lua`.
+- Удалена зависимость от `/Mods/SampleCommon/SampleAddonBase.lua` `GetTableSize`.
+- Удалены параметры `GUI.PANEL_HALF_WIDTH` и `GUI.PANEL_OFFSET_X` из `Config.lua`.
+- Удалён кэш имён компонентов (`_componentNamesCache`, `GetComponentName`) из `AlchemyRecipeService`.
+
+
+
 ## [v2.3.0](https://github.com/Alfa-ao/LibreAlchemyV2/releases/tag/v2.3.0)
 
 ### Added
@@ -14,6 +53,8 @@
 - `AlchemyTextFormatter` упразднен, логика форматирования перенесена в `AlchemyViewService`.
 - Строка `AVATAR_ITEM_TAKEN` переведена на формат `ValuedText`/XHTML с использованием тега `<alchemy>` и CSS-класса.
 - Сервис отладки перенесен из `Scripts/Services/AlchemyDebugService.lua` в `Libs/DebugService.lua`.
+
+
 
 ## [v2.3.0-beta.1](https://github.com/Alfa-ao/LibreAlchemyV2/releases/tag/v2.3.0-beta.1)
 
@@ -81,6 +122,8 @@
     - `Locales/lang/rus/DEBUG_REMOVED_BAR.txt`
 - Удалена зависимость от `mathUtils` в `AlchemySearchService`, `BacktrackingSearchAlgorithm` и `DrumShiftMapper`.
 - Удалена константа `MESSAGE_WARNING` из конфигурации.
+
+
 
 ## [v2.2.0-alpha.4](https://github.com/Alfa-ao/LibreAlchemyV2/releases/tag/v2.2.0-alpha.4)
 
@@ -179,6 +222,8 @@
   - `Locales/eng/*`.
 - Удалено неиспользуемое поле `_mathUtils` из `AlchemySearchService`.
 - Удалено неиспользуемое локальное объявление `local userMods = Facade.AO.userMods` из `Scripts/Facade.lua`.
+
+
 
 ## [v2.1.2-alpha.3](https://github.com/Alfa-ao/LibreAlchemyV2/releases/tag/v2.1.2-alpha.3)
 
