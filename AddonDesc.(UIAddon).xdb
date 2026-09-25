@@ -13,10 +13,15 @@
 		<useCommonScripts>false</useCommonScripts>
 	</userAddonInfo>
 	<ScriptFileRefs>
-		<!-- <Item href="/Mods/SampleCommon/SampleAddonBase.lua" /> -->
+		<Item href="/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua" />
 		<Item href="/Mods/SampleCommon/CoreScripts/AddonBaseUserMods.lua" />
 		<Item href="/Mods/SampleCommon/CoreScripts/AddonBase.lua" />
-		<Item href="/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua" />
+		<Item href="/Mods/SampleCommon/CoreScripts/WidgetCoreUserMods.lua" />
+		<Item href="/Mods/SampleCommon/CoreScripts/AdvancedHandlersUserMods.lua" />
+		
+		<!-- Config & State -->
+		<Item href="Scripts/Core/Config.lua" />
+		<Item href="Scripts/Core/AlchemyState.lua" />
 		
 		<!-- Debug -->
 		<Item href="Libs/var_dump.lua" />
@@ -28,10 +33,6 @@
 		
 		<!-- Drag & Drop -->
 		<Item href="Libs/DND/src/DnDManager.lua" />
-		
-		<!-- Core -->
-		<Item href="Scripts/Core/Config.lua" />
-		<Item href="Scripts/Core/AlchemyState.lua" />
 		
 		<!-- Search Subsystem (Реализации поиска) -->
 		<Item href="Scripts/Services/Search/RecipeEvaluator.lua" />
