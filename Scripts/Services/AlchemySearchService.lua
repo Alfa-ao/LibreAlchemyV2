@@ -6,13 +6,11 @@
 Class( "AlchemySearchService" )
 
 --------------------------------------------------------------------------------
---- @param state table AlchemyState Ссылка на глобальное состояние аддона.
 --- @param recipeService table AlchemyRecipeService Сервис для работы с рецептами (кэширование и фильтрация).
 --- @param mapper table DrumShiftMapper Маппер сдвигов барабанов.
 --- @param algorithm table BacktrackingSearchAlgorithm Алгоритм поиска.
 --------------------------------------------------------------------------------
-function AlchemySearchService:Init( state, recipeService, mapper, algorithm )
-	self._state = state
+function AlchemySearchService:Init( recipeService, mapper, algorithm )
 	self._recipe = recipeService
 	self._mapper = mapper
 	self._foundSet = {} -- Хеш-таблица для отслеживания уникальных найденных рецептов (используется внутри алгоритма).
@@ -30,11 +28,11 @@ function AlchemySearchService:FindBestRecipes()
 	local firstDrumInfo = avatar.GetAlchemyDrumInfo( 0 )
 	
 	if firstDrumInfo and firstDrumInfo.maxCorrectionsPerColumn and firstDrumInfo.maxCorrectionsPerColumn > 0 then
-		self._state.maxCorrections = firstDrumInfo.maxCorrectionsPerColumn
+		AlchemyState.maxCorrections = firstDrumInfo.maxCorrectionsPerColumn
 	end
 	
 	local totalCorrections = alchemyInfo.correctionCount or 0 -- Доступное количество коррекций (сдвигов барабанов)
-	self._state.drumsCount = alchemyInfo.drumsCount or self._state.drumsCount
+	AlchemyState.drumsCount = alchemyInfo.drumsCount or AlchemyState.drumsCount
 
 	-- Определяет доступность линий (строк) результата в интерфейсе алхимии (сдвиги -1, 0, 1)
 	local linesAvailability = {
@@ -62,9 +60,9 @@ function AlchemySearchService:FindBestRecipes()
 	self._recipe:FilterByComponents( drumRequiredComponents, totalDrumsCount )
 
 	-- Запускает алгоритм поиска для перебора вариантов с учетом коррекций и доступных линий
-	self._state.foundResults = self._algorithm:Execute( self._state, totalCorrections, linesAvailability )
+	local foundResults = self._algorithm:Execute( totalCorrections, linesAvailability )
     
-	--log( self._state.foundResults )
+	--log( foundResults )
     --[[ 
     table(1) {
         [1] => table(2) {
@@ -88,5 +86,5 @@ function AlchemySearchService:FindBestRecipes()
     }
      ]]
     
-	return self._state.foundResults
+	return foundResults
 end
