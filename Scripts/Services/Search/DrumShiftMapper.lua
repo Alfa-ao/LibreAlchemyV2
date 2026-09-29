@@ -5,13 +5,6 @@
 Class( "DrumShiftMapper" )
 
 --------------------------------------------------------------------------------
---- @param state table AlchemyState
---------------------------------------------------------------------------------
-function DrumShiftMapper:Init( state )
-	self._state = state
-end
-
---------------------------------------------------------------------------------
 --- Метод: Строит карту возможных сдвигов для каждого барабана.
 --- Определяет, какие компоненты можно получить на каждом барабане при разных сдвигах.
 --- @return table drumRequiredComponents таблица уникальных компонентов по барабанам
@@ -24,14 +17,14 @@ function DrumShiftMapper:BuildMap()
 	
 	-- Инициализируем карту сдвигов в состоянии. 
 	-- Таблица: { [индекс_барабана] = { [сдвиг] = "имя_компонента" } }
-    self._state.drumShiftMap = {}
+    AlchemyState.drumShiftMap = {}
 	
 	-- Счетчик барабанов, в которые положены предметы (itemId ~= nil).
     local totalDrumsCount = 0
 
     -- Проходит по всем доступным барабанам (от 1 до drumsCount)
-	for drumIndex = 1, self._state.drumsCount do
-		self._state.drumShiftMap[ drumIndex ] = {} -- Создает пустую таблицу для сдвигов текущего барабана
+	for drumIndex = 1, AlchemyState.drumsCount do
+		AlchemyState.drumShiftMap[ drumIndex ] = {} -- Создает пустую таблицу для сдвигов текущего барабана
 		local drumInfo = avatar.GetAlchemyDrumInfo( drumIndex - 1 ) -- Получает информацию о барабане
 		
 		-- Проверяет, что барабан существует и в него положен предмет
@@ -41,13 +34,13 @@ function DrumShiftMapper:BuildMap()
 			local basePos = drumInfo.position or 0 -- Текущая позиция барабана.
 			
 			-- Перебирается все возможные сдвиги
-			for shift = -self._state.maxCorrections, self._state.maxCorrections do
+			for shift = -AlchemyState.maxCorrections, AlchemyState.maxCorrections do
 				-- Вычисляется индекс компонента
-				local targetIndex = ( basePos + shift ) % self._state.drumSize
+				local targetIndex = ( basePos + shift ) % AlchemyState.drumSize
 				
 				local componentProperty = drumInfo.components[ targetIndex ] -- ID компонента (ComponentPropertyId)
 				-- Записывает в карту сдвигов: какой компонент получится при данном сдвиге
-				self._state.drumShiftMap[ drumIndex ][ shift ] = componentProperty
+				AlchemyState.drumShiftMap[ drumIndex ][ shift ] = componentProperty
 				uniqueDrumComponents[ componentProperty ] = true
 			end
 			
