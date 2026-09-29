@@ -10,21 +10,17 @@
 		<version>2.4.0</version>
 		<apiVersion>18000000</apiVersion>
 		<buildTime>0</buildTime>
-		<useCommonScripts>false</useCommonScripts>
+		<useCommonScripts>true</useCommonScripts>
 	</userAddonInfo>
 	<ScriptFileRefs>
-		<Item href="/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua" />
-		<Item href="/Mods/SampleCommon/CoreScripts/AddonBaseUserMods.lua" />
-		<Item href="/Mods/SampleCommon/CoreScripts/AddonBase.lua" />
-		<Item href="/Mods/SampleCommon/CoreScripts/WidgetCoreUserMods.lua" />
-		<Item href="/Mods/SampleCommon/CoreScripts/AdvancedHandlersUserMods.lua" />
+		<Item href="Libs/WidgetCoreExtends.lua"/>
 		
 		<!-- Config & State -->
 		<Item href="Scripts/Core/Config.lua" />
 		<Item href="Scripts/Core/AlchemyState.lua" />
 		
 		<!-- Debug -->
-		<!-- <Item href="Libs/var_dump.lua" /> -->
+		<Item href="Libs/var_dump.lua" />
 		<Item href="Libs/DebugService.lua" />
 		
 		<!-- Enum -->
@@ -50,7 +46,7 @@
 		
 		<!-- Events -->
 		<Item href="Scripts/Events/AlchemyEvents.lua" />
-		<Item href="Scripts/Events/AlchemyAvatarEvents.lua" />
+		<Item href="Scripts/Events/AvatarEvents.lua" />
 		
 		<!-- Init -->
 		<Item href="Scripts/Core/AlchemyInit.lua" />
