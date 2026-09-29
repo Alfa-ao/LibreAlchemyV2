@@ -7,7 +7,7 @@ Class( "BacktrackingSearchAlgorithm" )
 -- Helper: добавить компонент по смещению.
 local function addComp( step, line, offset )
 	if not line then return nil end
-	local comp = step.state.drumShiftMap[ step.drumIdx ][ step.shift + offset ]
+	local comp = AlchemyState.drumShiftMap[ step.drumIdx ][ step.shift + offset ]
 	if comp then
 		line[ comp ] = ( line[ comp ] or 0 ) + 1
 		return comp
@@ -33,28 +33,25 @@ function BacktrackingSearchAlgorithm:Init( evaluator )
 end
 
 --------------------------------------------------------------------------------
---- @param state table Глобальное состояние.
 --- @param totalCorrections number Доступное количество коррекций (сдвигов барабанов)
 --- @param linesAvailability table Доступность линий (строк) результата в интерфейсе алхимии (сдвиги -1, 0, 1)
 --- @return table foundResults
 --------------------------------------------------------------------------------
-function BacktrackingSearchAlgorithm:Execute( state, totalCorrections, linesAvailability )
+function BacktrackingSearchAlgorithm:Execute( totalCorrections, linesAvailability )
 	local foundResults = {}
 	local foundSet = {}
 
 	-- Локальная рекурсивная функция
 	local function recursiveSearch( drumIdx, shiftsLeft, currentShifts, lineZero, lineMinusOne, linePlusOne )
-		local filteredRecipes = state.filteredRecipes
-		
 		-- Если уже нашлись все возможные отфильтрованные рецепты, дальше искать нет смысла
-		if filteredRecipes and #filteredRecipes > 0 and #foundResults >= #filteredRecipes then 
+		if AlchemyState.filteredRecipes and #AlchemyState.filteredRecipes > 0 and #foundResults >= #AlchemyState.filteredRecipes then 
 			return 
 		end
 		
 		-- Обработка нескольких барабанов рекурсивно, если они есть
 		if drumIdx > 0 then
 			-- Если для текущего барабана нет возможных сдвигов (он пустой или не инициализирован)
-			if next( state.drumShiftMap[ drumIdx ] ) == nil then
+			if next( AlchemyState.drumShiftMap[ drumIdx ] ) == nil then
 				currentShifts[ drumIdx ] = 0 -- Фиксируется сдвиг 0
 				-- К следующему (предыдущему по индексу) барабану
 				recursiveSearch( drumIdx - 1, shiftsLeft, currentShifts, lineZero, lineMinusOne, linePlusOne )
@@ -63,13 +60,12 @@ function BacktrackingSearchAlgorithm:Execute( state, totalCorrections, linesAvai
 			end
 			
 			-- Вычисляет максимальный сдвиг для текущего барабана
-			local maxShift = math.min( shiftsLeft, state.maxCorrections )
+			local maxShift = math.min( shiftsLeft, AlchemyState.maxCorrections )
 			
 			-- Перебирает все возможные сдвиги для текущего барабана
 			for shift = -maxShift, maxShift do 
 				local nextLeft = shiftsLeft - math.abs( shift ) -- Очки коррекции, которые останутся для следующих барабанов.
 				local step = {
-                    state = state,
                     drumIdx = drumIdx,
                     shift = shift
                 }
@@ -91,7 +87,7 @@ function BacktrackingSearchAlgorithm:Execute( state, totalCorrections, linesAvai
 		else
 			local function registerLine( componentMap )
 				if not componentMap then return end
-				local bestRecipe = self._evaluator:FindBestRecipe( componentMap, filteredRecipes )
+				local bestRecipe = self._evaluator:FindBestRecipe( componentMap, AlchemyState.filteredRecipes )
 				if bestRecipe and not foundSet[ bestRecipe.name ] then
 					foundSet[ bestRecipe.name ] = true
 					table.insert( foundResults, {
@@ -110,7 +106,7 @@ function BacktrackingSearchAlgorithm:Execute( state, totalCorrections, linesAvai
 	-- Запуск перебора
 	for shiftsLeft = 0, totalCorrections do
 		recursiveSearch(
-			state.drumsCount, 
+			AlchemyState.drumsCount, 
 			shiftsLeft, 
 			{}, 
 			linesAvailability.zero, 
