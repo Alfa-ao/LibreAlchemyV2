@@ -8,21 +8,13 @@
 Class( "AlchemyRecipeService" )
 
 --------------------------------------------------------------------------------
---- Инициализация сервиса.
---- @param state table AlchemyState
---------------------------------------------------------------------------------
-function AlchemyRecipeService:Init( state )
-	self._state = state
-end
-
---------------------------------------------------------------------------------
 --- Создается и сохраняется в кэш полный список всех доступных рецептов алхимии.
 --- Выполняется один раз при открытии окна алхимии или при изменении списка рецептов.
 --------------------------------------------------------------------------------
 function AlchemyRecipeService:CreateRecipeCache()
 	-- Если кэш уже создан, выход.
-	if self._state.recipeCache ~= nil then
-		--log(self._state.recipeCache)
+	if self._recipeCache then
+		--log(self._recipeCache)
 		--[[ 
 		table(12) {
 			["active"] => boolean(true)
@@ -106,7 +98,7 @@ function AlchemyRecipeService:CreateRecipeCache()
 		return
 	end
 	
-	self._state.recipeCache = {}
+	self._recipeCache = {}
 	
 	-- alchemyInfo: table = { drumsCount, correctionCount, recipes (массив RecipeId) и т.д }.
 	local alchemyInfo = avatar.GetAlchemyInfo()
@@ -138,9 +130,9 @@ function AlchemyRecipeService:CreateRecipeCache()
 	 ]]
 	
 	-- кол-во доступных барабанов
-	self._state.drumsCount = alchemyInfo.drumsCount
+	AlchemyState.drumsCount = alchemyInfo.drumsCount
 	-- кол-во рандомных аспектов в одном барабане
-	self._state.drumSize = alchemyInfo.drumSize
+	AlchemyState.drumSize = alchemyInfo.drumSize
 
 	-- Проходит по всем рецептам
 	-- recipeId: userdata (RecipeId) - идентификатор ресурса рецепта
@@ -198,7 +190,7 @@ function AlchemyRecipeService:CreateRecipeCache()
 			end
 
 			-- Добавляет готовую структуру рецепта в общий кэш
-			table.insert( self._state.recipeCache, recipe )
+			table.insert( self._recipeCache, recipe )
 		end
 	end
 end
@@ -251,12 +243,12 @@ function AlchemyRecipeService:FilterByComponents( availableComponents, filledDru
 	-- Проверить кэш.
 	self:CreateRecipeCache()
 	
-	self._state.filteredRecipes = {}
+	AlchemyState.filteredRecipes = {}
 	local count = 0
 	
-	for _, recipe in pairs( self._state.recipeCache ) do
+	for _, recipe in pairs( self._recipeCache ) do
 		if self:IsRecipeMatch( recipe, availableComponents, filledDrumsCount ) then
-			table.insert( self._state.filteredRecipes, recipe )
+			table.insert( AlchemyState.filteredRecipes, recipe )
 			count = count + 1
 		end
 	end
@@ -280,7 +272,7 @@ function AlchemyRecipeService:CountPotential() -- ФУНКЦИЯ провере�
 	local availableComponents = {} -- Какие и кол-во аспектов(компонентов) за все вложенные в слоты(барабаны)
 
 	-- Проходит по всем слотам(барабанам).
-	for drumIdx = 0, self._state.drumsCount - 1 do
+	for drumIdx = 0, AlchemyState.drumsCount - 1 do
 		
 		-- Выводит рандомную ленту компонентов(аспектов) (24шт) из предмета(травы) конкретного барабана.
 		local drumInfo = avatar.GetAlchemyDrumInfo( drumIdx )
@@ -316,7 +308,7 @@ function AlchemyRecipeService:CountPotential() -- ФУНКЦИЯ провере�
 	}
 	 ]]
 	-- Проверяет, сколько рецептов из кэша удовлетворяют собранному набору
-	for _, recipe in pairs( self._state.recipeCache ) do
+	for _, recipe in pairs( self._recipeCache ) do
 		if self:IsRecipeMatch( recipe, availableComponents, filledDrumsCount ) then
 			potentialCount = potentialCount + 1
 		end
@@ -324,4 +316,13 @@ function AlchemyRecipeService:CountPotential() -- ФУНКЦИЯ провере�
 
 	-- Возвращает количество возможных рецептов и количество заполненных слотов
 	return potentialCount, filledDrumsCount
+end
+
+
+
+--------------------------------------------------------------------------------
+-- Сброс кэша всех доступных рецептов.
+--------------------------------------------------------------------------------
+function AlchemyState:ResetRecipeCache()
+    self._recipeCache = nil
 end
