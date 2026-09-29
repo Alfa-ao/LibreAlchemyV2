@@ -3,7 +3,7 @@
 -- Хранилище изменяемого состояния аддона.
 --------------------------------------------------------------------------------
 
-Class( "AlchemyState", {
+Global( "AlchemyState", {
     -- Флаги состояния
     active = false,             -- boolean - Активно ли окно алхимии.
     reactionSuccess = false,    -- boolean - Была ли реакция успешной (найден рецепт).
@@ -11,10 +11,10 @@ Class( "AlchemyState", {
     localization = nil,         -- Локализация (rus, eng) common.GetLocalization.
 
     -- Кэш данных и результаты поиска
-    recipeCache = nil,          -- ?table - Кэш списка всех доступных игроку рецептов алхимии.
+    --recipeCache = nil,          -- ?table - Кэш списка всех доступных игроку рецептов алхимии.
     filteredRecipes = nil,      -- ?table - Отфильтрованный список рецептов (по компонентам в барабанах).
     drumShiftMap = nil,         -- ?table - Карта сдвигов: [индекс_барабана][сдвиг] = "имя_компонента".
-    foundResults = nil,         -- ?table - Таблица найденных вариантов (рецепт + сдвиги барабанов).
+    --foundResults = nil,         -- ?table - Таблица найденных вариантов (рецепт + сдвиги барабанов).
     
     -- Параметры ступки (барабанов)
     drumSize = 0,               -- Количество аспектов (компонентов) в одном барабане.
@@ -37,55 +37,54 @@ Class( "AlchemyState", {
 --------------------------------------------------------------------------------
 
 -- Сброс состояния слотов к начальным значениям.
-function AlchemyState:ResetPlace() --- void
-    self.place.placed = nil
-    self.place.count = 0
+function AlchemyState.ResetPlace()
+    AlchemyState.place.placed = nil
+    AlchemyState.place.count = 0
 end
 --------------------------------------------------------------------------------
 
 -- Сброс состояния при выходе и переключение для повторного открытия
-function AlchemyState:ResetActive() --- void
-    self.reactionSuccess = false -- Сбрасываем флаг успешной реакции
-    self.active = false          -- Помечаем аддон как неактивный
+function AlchemyState.ResetActive()
+    AlchemyState.reactionSuccess = false -- Сбрасываем флаг успешной реакции
+    AlchemyState.active = false          -- Помечаем аддон как неактивный
     
-    self:CancelAllDelayedCalls()
+    AlchemyState.CancelAllDelayedCalls()
 end
 
 --------------------------------------------------------------------------------
 
 -- Сброс кэша поиска.
-function AlchemyState:ResetSearchCache() --- void
-    self.filteredRecipes = nil
-    self.drumShiftMap = nil
-    self.foundResults = nil
-end
+--[[ function AlchemyState.ResetSearchCache()
+    AlchemyState.filteredRecipes = nil
+    AlchemyState.drumShiftMap = nil
+    --AlchemyState.foundResults = nil
+end ]]
 
 --------------------------------------------------------------------------------
 
 -- Сброс кэша всех доступных рецептов.
-function AlchemyState:ResetRecipeCache() --- void
-    self.recipeCache = nil
-end
+--[[ function AlchemyState.ResetRecipeCache()
+    AlchemyState.recipeCache = nil
+end ]]
 
 --------------------------------------------------------------------------------
--- Инвалидация результатов реакции.
 -- Вызывается, когда слоты изменяются (предмет вынут), делая старый результат недействительным.
 --------------------------------------------------------------------------------
-function AlchemyState:InvalidateReaction() --- void
-    self.reactionSuccess = false
-    self.foundResults = nil
+function AlchemyState.InvalidateReaction()
+    AlchemyState.reactionSuccess = false
+    --AlchemyState.foundResults = nil
 end
 
 --------------------------------------------------------------------------------
 -- Отмена всех запланированных отложенных вызовов и очистка хранилища ссылок.
 --------------------------------------------------------------------------------
-function AlchemyState:CancelAllDelayedCalls() --- void
-    for _, functionRef in pairs( self.taskRefs ) do
+function AlchemyState.CancelAllDelayedCalls()
+    for _, functionRef in pairs( AlchemyState.taskRefs ) do
         if functionRef ~= nil then
             common.CancelDelayedCall( functionRef )
         end
     end
     
     -- Полная очистка таблицы ссылок
-    self.taskRefs = {}
+    AlchemyState.taskRefs = {}
 end
