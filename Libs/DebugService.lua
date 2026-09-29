@@ -1,27 +1,31 @@
 --------------------------------------------------------------------------------
 -- DebugService.lua
 -- Сервис для управления отладочным логированием аддона.
+-- Доболнительно создается log для упрощенности.
 --------------------------------------------------------------------------------
 
-Class( "DebugService" )
+Global( "DebugService", {} )
 
--- Use var_dump if exists
-local VAR_DUMP_EXISTS = apitype( rawget( _G, "var_dump" ) ) == "function"
+local _var_dump_exists = type( rawget( _G, "var_dump" ) ) == "function"
 
-Global( "log", function( ... )
-    if VAR_DUMP_EXISTS then
-        var_dump( ... )
-    else
-        LogInfo( ... )
-    end
+Global( "log", function( ... ) 
+	( _var_dump_exists and var_dump or LogInfo )( ... )
 end )
 
+local _categories = {}
+
 --------------------------------------------------------------------------------
---- Инициализация сервиса отладки.
 --- @param categories table Таблица состояния категорий логирования (category - имя категории, значение - boolean).
 --------------------------------------------------------------------------------
-function DebugService:Init( categories )
-	self._categories = type( categories ) == "table" and categories or {}
+function DebugService.Init( categories )
+	_categories = type( categories ) == "table" and categories or {}
+	
+	for category, _ in pairs( _categories ) do
+        local methodName = "Log" .. category
+        DebugService[ methodName ] = function( ... )
+            DebugService.Log( category, ... )
+        end
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -29,28 +33,28 @@ end
 --- @param category string имя категории
 --- @param isEnabled boolean 
 --------------------------------------------------------------------------------
-function DebugService:SetEnabled( category, isEnabled )
-	if self._categories[category] ~= nil then
-		self._categories[category] = isEnabled
+function DebugService.SetEnabled( category, isEnabled )
+	if _categories[category] ~= nil then
+		_categories[category] = isEnabled
 	end
 end
 
 --------------------------------------------------------------------------------
---- Проверить, включена ли указанная категория логирования.
---- @param category string имя категории
+--- Проверка, включена ли указанная категория логирования.
+--- @param category string Имя категории
 --- @return boolean
 --------------------------------------------------------------------------------
-function DebugService:IsEnabled( category )
-	return self._categories[category] == true
+function DebugService.IsEnabled( category )
+	return _categories[category] == true
 end
 
 --------------------------------------------------------------------------------
---- Формирует строку сообщения и выводит её в лог.
---- @param category string категория логирования
+--- Преорбразовывает в строку и выводит её в лог.
+--- @param category string Категория логирования
 --- @param ... any
 --------------------------------------------------------------------------------
-function DebugService:Log( category, ... )
-	if not self:IsEnabled( category ) then
+function DebugService.Log( category, ... )
+	if not DebugService.IsEnabled( category ) then
 		return
 	end
 	
@@ -59,10 +63,8 @@ function DebugService:Log( category, ... )
 	for i, v in ipairs { ... }  do
 		if type( v ) == "function" then
 			args[i] = v() -- Если дебаг блок в функции
-		elseif not VAR_DUMP_EXISTS and apitype( v ) == "WString" then
+		elseif not _var_dump_exists and apitype( v ) == "WString" then
 			args[i] = string.format( "WString( %s )", userMods.FromWString( v ) )
-		elseif not VAR_DUMP_EXISTS then
-			args[i] = tostring( v )
 		else
 			args[i] = v
 		end
