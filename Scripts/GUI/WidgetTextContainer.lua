@@ -12,6 +12,8 @@ Class( "WidgetTextContainer", {
 --------------------------------------------------------------------------------
 function WidgetTextContainer:Init()
     self._wtParent = self._wtTextContainer:GetParent()
+    
+    advEvent.RegisterEventHandlers( false, self:GetActiveEventHandlers() )
 end
 
 --------------------------------------------------------------------------------
@@ -64,7 +66,7 @@ end
 function WidgetTextContainer:GetExactTextHeight()
     self._wtTextContainer:ForceReposition()
     
-    local content = self._wtTextContainer:GetChildChecked( "__Border" ):GetChildChecked( "__Content" )
+    local content = self._wtTextContainer.wt__Border.wt__Content
     local contentPlc = content:GetPlacementPlain()
     return contentPlc.posY + contentPlc.sizeY
 end
@@ -80,4 +82,19 @@ function WidgetTextContainer:UpdateCenterPanel()
     plc.posY = CONFIG.GUI.SIZE_Y / 2 + plc.sizeY / 2
     
     self._wtParent:SetPlacementPlain( plc )
+end
+
+--------------------------------------------------------------------------------
+--- @return table handlers
+--------------------------------------------------------------------------------
+function WidgetTextContainer:GetActiveEventHandlers()
+    return {
+        { -- Обновляет размеры Panel при изменении масштаба/размера окна игры.
+            function()
+                local exactHeight = self:GetExactTextHeight()
+                self:UpdateSizePanel( exactHeight )
+            end,
+            "EVENT_POS_CONVERTER_CHANGED"
+        },
+    }
 end
