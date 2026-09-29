@@ -14,7 +14,7 @@
 
 ## Установка
 
-Скачать последний релиз: **[Latest Release](https://github.com/Alfa-ao/LibreAlchemyV2/releases/latest)**
+Скачать последний релиз: **[Download Latest Release](https://github.com/Alfa-ao/LibreAlchemyV2/releases/latest)**
 
 ## Конфигурация
 
