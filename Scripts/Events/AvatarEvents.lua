@@ -1,28 +1,32 @@
 --------------------------------------------------------------------------------
--- Events/AlchemyAvatarEvents.lua
+-- Events/AvatarEvents.lua
 -- Класс, отвечающий за обработку событий персонажа (EVENT_AVATAR_*).
 --------------------------------------------------------------------------------
 
-Class( "AlchemyAvatarEvents", {
-    _wtMovable = nil,
+Class( "AvatarEvents", {
+    _wtMovable = nil
 } )
 
 --------------------------------------------------------------------------------
 --- @param context table -- Набор всякого всяческого
 --------------------------------------------------------------------------------
-function AlchemyAvatarEvents:Init( context )
-    self._state = context.state
+function AvatarEvents:Init( context )
     self._alchemy = context.alchemy
-    self._debug = context.debug
     self._dnd = context.dnd
     self._view = context.view
+    
+    advEvent.RegisterEventHandlers( false, self:GetActiveEventHandlers() )
+    
+    if avatar.IsExist() then
+        self:OnAvatarCreated()
+    end
 end
 
 --------------------------------------------------------------------------------
 --- Обработчик события EVENT_AVATAR_CREATED.
 --- Выполняется при входе персонажа в игру.
 --------------------------------------------------------------------------------
-function AlchemyAvatarEvents:OnAvatarCreated()
+function AvatarEvents:OnAvatarCreated()
     self._view:UpdateCenterPanel()
     
     if CONFIG.ENABLE_CUSTOM_LAYOUT then
@@ -40,14 +44,14 @@ end
 --- и реакция была успешной, выводит поздравление с названием и количеством зелий.
 --- @param params table { actionType: string, itemObject: ValuedObjectLua }
 --------------------------------------------------------------------------------
-function AlchemyAvatarEvents:OnItemTaken( params )
+function AvatarEvents:OnItemTaken( params )
     -----------------DEBUG------------------
-    self._debug:LogGeneral( "EVENT_AVATAR_ITEM_TAKEN", { 
+    DebugService.LogGeneral( "EVENT_AVATAR_ITEM_TAKEN", { 
         "params: { actionType: string, itemObject: ValuedObjectLua }", params 
     } )
     ------------------END-------------------
     
-    if params.actionType == EnumTakeItemActionType.CRAFT and self._state.reactionSuccess then
+    if params.actionType == EnumTakeItemActionType.CRAFT and AlchemyState.reactionSuccess then
         -- Информация о созданном предмете по его ID.
         local info = itemLib.GetItemInfo( params.itemObject:GetId() )
         if not info or not info.name then return end
@@ -56,4 +60,20 @@ function AlchemyAvatarEvents:OnItemTaken( params )
         
         self._view:ShowItemTaken( info.name, count )
     end
+end
+
+--------------------------------------------------------------------------------
+--- @return table handlers
+--------------------------------------------------------------------------------
+function AvatarEvents:GetActiveEventHandlers()
+    return {
+        { -- Инициализация логики. Когда игрок уже в игре, только тогда необходимо применинить следующую логику.
+            function() self:OnAvatarCreated() end,
+            "EVENT_AVATAR_CREATED"
+        },
+        { -- Всё что попало в сумку игрока от крафта алхимки.
+            function( params ) self:OnItemTaken( params ) end,
+            "EVENT_AVATAR_ITEM_TAKEN"
+        },
+    }
 end
