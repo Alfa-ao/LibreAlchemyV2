@@ -11,7 +11,28 @@ Class( "AlchemyViewService" )
 function AlchemyViewService:Init( context )
     self._alchemy = context.alchemy
     self._textContainer = context.textContainer
-    self._state = context.state
+end
+
+--------------------------------------------------------------------------------
+-- Запланировать автоматический сброс типа сообщения к MESSAGE_NORMAL.
+-- Необходимо, чтобы приветствие или поздравление задержалось отображением, а затем тригер возвращался к нормальному режиму.
+--------------------------------------------------------------------------------
+function AlchemyViewService:ScheduleResetMessageType()
+    if AlchemyState.messageType == CONFIG.MESSAGE_NORMAL then
+        return
+    end
+    
+    if AlchemyState.taskRefs.funcResetMessageType ~= nil then
+        common.CancelDelayedCall( AlchemyState.taskRefs.funcResetMessageType )
+    end
+
+    AlchemyState.taskRefs.funcResetMessageType = common.DelayedCall( CONFIG.DELAY_MS_UPDATE, function()
+        AlchemyState.messageType = CONFIG.MESSAGE_NORMAL
+        AlchemyState.taskRefs.funcResetMessageType = nil
+        -----------------DEBUG------------------
+        DebugService.LogGeneral( "MESSAGE_TYPE change to default: <MESSAGE_NORMAL>" )
+        ------------------END-------------------
+    end )
 end
 
 --------------------------------------------------------------------------------
@@ -20,9 +41,9 @@ end
 --------------------------------------------------------------------------------
 function AlchemyViewService:ShowGreetings( messageType )
     if messageType == CONFIG.MESSAGE_WELCOME_BACK then
-        self._textContainer:SetLines( GetAddonText( self._state.localization, "WELCOME_BACK" ) )
+        self._textContainer:SetLines( GetAddonText( AlchemyState.localization, "WELCOME_BACK" ) )
     elseif messageType == CONFIG.MESSAGE_GREETINGS then
-        self._textContainer:SetLines( GetAddonText( self._state.localization, "GREETINGS" ) )
+        self._textContainer:SetLines( GetAddonText( AlchemyState.localization, "GREETINGS" ) )
     end
 end
 
@@ -34,14 +55,14 @@ end
 function AlchemyViewService:ShowPotentialRecipes( countRecipe, filledSlotsCount )
     if countRecipe > 0 then
         local vtCountRecipes = common.CreateValuedText {
-            format = GetAddonText( self._state.localization, "COUNT_RECIPES" ),
+            format = GetAddonText( AlchemyState.localization, "COUNT_RECIPES" ),
             count  = countRecipe,
         }
         self._textContainer:SetLines( vtCountRecipes )
     elseif filledSlotsCount > 0 then
-        self._textContainer:SetLines( GetAddonText( self._state.localization, "COMPONENTS_NOT_READY" ) )
+        self._textContainer:SetLines( GetAddonText( AlchemyState.localization, "COMPONENTS_NOT_READY" ) )
     else
-        self._textContainer:SetLines( GetAddonText( self._state.localization, "NOT_FOUND_RECIPES" ) )
+        self._textContainer:SetLines( GetAddonText( AlchemyState.localization, "NOT_FOUND_RECIPES" ) )
     end
 end
 
@@ -53,7 +74,7 @@ end
 --------------------------------------------------------------------------------
 function AlchemyViewService:ShowReactionResults( foundResults, maxDisplay, drumsCount )
     if #foundResults == 0 then
-        self._textContainer:SetLines( GetAddonText( self._state.localization, "RESULT_GIBBERISH" ) )
+        self._textContainer:SetLines( GetAddonText( AlchemyState.localization, "RESULT_GIBBERISH" ) )
     else
         local linesData = self:FormatResults( foundResults, maxDisplay, drumsCount )
         self._textContainer:SetLines( table.unpack( linesData ) )
@@ -64,7 +85,7 @@ end
 --- Показывает поздравление с изменением списка рецептов.
 --------------------------------------------------------------------------------
 function AlchemyViewService:ShowCongratulation()
-    self._textContainer:SetLines( GetAddonText( self._state.localization, "CONGRATULATION" ) )
+    self._textContainer:SetLines( GetAddonText( AlchemyState.localization, "CONGRATULATION" ) )
 end
 
 --------------------------------------------------------------------------------
@@ -74,7 +95,7 @@ end
 --------------------------------------------------------------------------------
 function AlchemyViewService:ShowItemTaken( potionName, count )
     local vtItem = common.CreateValuedText {
-        format = GetAddonText( self._state.localization, "AVATAR_ITEM_TAKEN" ),
+        format = GetAddonText( AlchemyState.localization, "AVATAR_ITEM_TAKEN" ),
         name   = potionName,
         count  = count,
         class1 = "alchemy-yellow-text",
