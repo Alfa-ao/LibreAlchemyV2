@@ -3,7 +3,7 @@
     <Name>Panel</Name>
     <Priority>0</Priority>
     <Children>
-        <Item href="Text/ouText.(WidgetTextContainer).xdb" />
+        <Item href="Text/TextContainer.(WidgetTextContainer).xdb" />
     </Children>
     <BackLayer href="Text/Textures/Tooltip.(WidgetLayerTiledTexture).xdb" />
     <Placement>
