@@ -16,8 +16,8 @@
 		<Item href="Libs/WidgetCoreExtends.lua"/>
 		
 		<!-- Config & State -->
-		<Item href="Scripts/Core/Config.lua" />
-		<Item href="Scripts/Core/AlchemyState.lua" />
+		<Item href="Scripts/Config.lua" />
+		<Item href="Scripts/State.lua" />
 		
 		<!-- Debug -->
 		<Item href="Libs/var_dump.lua" />
@@ -31,25 +31,25 @@
 		<Item href="Libs/DND/src/DnDManager.lua" />
 		
 		<!-- Search Subsystem (Реализации поиска) -->
-		<Item href="Scripts/Services/Search/RecipeEvaluator.lua" />
-		<Item href="Scripts/Services/Search/DrumShiftMapper.lua" />
-		<Item href="Scripts/Services/Search/BacktrackingSearchAlgorithm.lua" />
+		<Item href="Scripts/Search/RecipeEvaluator.lua" />
+		<Item href="Scripts/Search/DrumShiftMapper.lua" />
+		<Item href="Scripts/Search/BacktrackingSearchAlgorithm.lua" />
 		
 		<!-- Services (Сервисы) -->
-		<Item href="Scripts/Services/AlchemyRecipeService.lua" />
-		<Item href="Scripts/Services/AlchemySearchService.lua" />
-		<Item href="Scripts/Services/AlchemyViewService.lua" />
+		<Item href="Scripts/ClassRecipeService.lua" />
+		<Item href="Scripts/ClassSearchService.lua" />
+		<Item href="Scripts/ClassViewService.lua" />
 		
 		<!-- GUI -->
-		<Item href="Scripts/GUI/WidgetAlchemyV2.lua" />
-		<Item href="Scripts/GUI/WidgetTextContainer.lua" />
+		<Item href="Scripts/ClassGUIAlchemyV2.lua" />
+		<Item href="Scripts/ClassGUITextContainer.lua" />
 		
 		<!-- Events -->
-		<Item href="Scripts/Events/AlchemyEvents.lua" />
-		<Item href="Scripts/Events/AvatarEvents.lua" />
+		<Item href="Scripts/ClassAlchemyEvents.lua" />
+		<Item href="Scripts/ClassAvatarEvents.lua" />
 		
 		<!-- Init -->
-		<Item href="Scripts/Core/AlchemyInit.lua" />
+		<Item href="Scripts/Main.lua" />
 	</ScriptFileRefs>
 	<textsGroups>
 		<Item>
