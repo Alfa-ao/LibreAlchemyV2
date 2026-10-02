@@ -8,15 +8,14 @@ Class( "AlchemyEvents", {
 } )
 
 --------------------------------------------------------------------------------
---- @param services table -- Набор всякого всяческого
+--- @param services table
 --------------------------------------------------------------------------------
 function AlchemyEvents:Init( services )
-    self._search = services.search
-    self._recipe = services.recipe
-    self._view   = services.view
-    
+    self._services = services
     advEvent.RegisterEventHandlers( false, self:GetActiveEventHandlers() )
 end
+
+
 
 --------------------------------------------------------------------------------
 -- Обработчик события EVENT_ALCHEMY_STARTED.
@@ -25,18 +24,20 @@ end
 function AlchemyEvents:OnStarted()
     _G.mainForm:Show( true )
 
-    -- Создает кэш всех доступных рецептов.
-    self._recipe:CreateRecipeCache()
+    -- Создается кэш всех доступных рецептов.
+    self._services.recipe:CreateRecipeCache()
 
     -- Выводит HELLO сообщение в зависимости от предыдущего состояния
-    self._view:ShowGreetings()
+    self._services.view:ShowGreetings()
     -----------------DEBUG------------------
-    DebugService.LogGeneral( "EVENT_ALCHEMY_STARTED", { "ShowGreetings:", self._view.messageType } )
+    DebugService.LogGeneral( "EVENT_ALCHEMY_STARTED", { "ShowGreetings:", self._services.view.messageType } )
     ------------------END-------------------
     
-    -- Запланировать возврат к MESSAGE_NORMAL режиму
-    self._view:ScheduleResetMessageType()
+    -- Запланировать возврат к режиму MESSAGE_NORMAL
+    self._services.view:ScheduleResetMessageType()
 end
+
+
 
 --------------------------------------------------------------------------------
 --- Обработчик события EVENT_ALCHEMY_CANCELED.
@@ -49,12 +50,12 @@ function AlchemyEvents:OnCanceled( params )
     -- Fix: 17.0.01.37 isSuccess (number(0/1))
     if not params.isSuccess or params.isSuccess == 0 then
         _G.mainForm:Show( false )
-        self.reactionSuccess = false -- Сбрасываем флаг успешной реакции
+        self.reactionSuccess = false -- Сброс флага успешной реакции
         
         AlchemyState.CancelAllDelayedCalls()
         
         -- При следующем открытии покажет сообщение "С возвращением!"
-        self._view.messageType = CONFIG.MESSAGE_WELCOME_BACK
+        self._services.view.messageType = CONFIG.MESSAGE_WELCOME_BACK
     end
     
     -----------------DEBUG------------------
@@ -64,6 +65,8 @@ function AlchemyEvents:OnCanceled( params )
     )
     ------------------END-------------------
 end
+
+
 
 --------------------------------------------------------------------------------
 --- Обработчик события EVENT_ALCHEMY_ITEM_PLACED.
@@ -86,9 +89,9 @@ function AlchemyEvents:OnItemPlaced( params )
     )
     ------------------END-------------------
     
-    -- Если сейчас не стандартный режим отображения, текст не обновляется.
-    -- Автоматически переключится.
-    if self._view.messageType ~= CONFIG.MESSAGE_NORMAL then
+    -- Если сейчас не стандартный режим отображения, то текст не обновляется.
+    -- Автоматически переключится через {CONFIG.DELAY_MS_UPDATE}.
+    if self._services.view.messageType ~= CONFIG.MESSAGE_NORMAL then
         return
     end
     
@@ -96,19 +99,19 @@ function AlchemyEvents:OnItemPlaced( params )
     local function funcGetMessage()
         AlchemyState.taskRefs.funcAlchemyItemPlaced = nil
         
-        -- Если находимся в МЕНЮ, то показывает "ВОзможно N рецептов"
+        -- Если находимся в меню, то показывает "Возможно N рецептов"
         if not self.reactionSuccess then
             -- Кол-во возможных рецептов (countRecipe) и кол-во требуемых слотов (filledDrumsCount)
-            local countRecipe, filledDrumsCount = self._recipe:CountPotential()
+            local countRecipe, filledDrumsCount = self._services.recipe:CountPotential()
             
-            self._view:ShowPotentialRecipes( countRecipe, filledDrumsCount )
+            self._services.view:ShowPotentialRecipes( countRecipe, filledDrumsCount )
             -----------------DEBUG------------------
             DebugService.LogGeneral( { "ShowPotentialRecipes:", countRecipe } )
             ------------------END-------------------
         end
     end
     
-    -- Отменяет предыдущий таймер, если он уже был запланирован
+    -- Отменяется предыдущий таймер, если он уже был запланирован
     if AlchemyState.taskRefs.funcAlchemyItemPlaced ~= nil then
         common.CancelDelayedCall( AlchemyState.taskRefs.funcAlchemyItemPlaced )
     end
@@ -117,14 +120,16 @@ function AlchemyEvents:OnItemPlaced( params )
     AlchemyState.taskRefs.funcAlchemyItemPlaced = common.DelayedCall( CONFIG.DELAY_MS_UPDATE, funcGetMessage )
 end
 
+
+
 --------------------------------------------------------------------------------
 -- Обработчик события EVENT_ALCHEMY_REACTION_FINISHED.
 -- Срабатывает сразу после начала процесса варки (нажатие кнопки "варить").
 --------------------------------------------------------------------------------
 function AlchemyEvents:OnReactionFinished()
-    -- Запускает алгоритм поиска подходящих рецептов
-    local found = self._search:FindBestRecipes()
-    self._view:ShowReactionResults( found, CONFIG.MAX_DISPLAY_RESULTS, AlchemyState.drumsCount )
+    -- Запускается алгоритм поиска подходящих рецептов
+    local found = self._services.search:FindBestRecipes()
+    self._services.view:ShowReactionResults( found, CONFIG.MAX_DISPLAY_RESULTS, AlchemyState.drumsCount )
     
     -- Если ничего не найдено
     if #found == 0 then
@@ -135,12 +140,14 @@ function AlchemyEvents:OnReactionFinished()
     else
         -----------------DEBUG------------------
         DebugService.LogReaction( function()
-            return self._view:ResultsForLog( found, CONFIG.MAX_DISPLAY_RESULTS, AlchemyState.drumsCount )
+            return self._services.view:ResultsForLog( found, CONFIG.MAX_DISPLAY_RESULTS, AlchemyState.drumsCount )
         end )
         ------------------END-------------------
         self.reactionSuccess = true
     end
 end
+
+
 
 --------------------------------------------------------------------------------
 -- Обработчик события EVENT_ALCHEMY_RECIPES_CHANGED.
@@ -151,22 +158,24 @@ function AlchemyEvents:OnRecipesChanged()
     DebugService.LogGeneral( "EVENT_ALCHEMY_RECIPES_CHANGED" )
     ------------------END-------------------
     
-    -- Сбрасывает кэш рецептов для обновления
-    self._recipe:ResetRecipeCache()
+    -- Сбрасывается кэш рецептов для обновления
+    self._services.recipe:ResetRecipeCache()
 	
 	-- Заглушка если алхимка не открыта, но взяли допустим рецепт из Айрина и добавили зелье в рецепт.
 	if not _G.mainForm:IsVisible() then return end
 	
     -- Поздравить игрока.
-    self._view:ShowCongratulation()
+    self._services.view:ShowCongratulation()
     
     -- Отрубить сообщения в EVENT_ALCHEMY_ITEM_PLACED
     -- поздравление (работаем дальше с алхимкой) или Приветсвие (переоткрыли окно)
-    self._view.messageType = CONFIG.MESSAGE_WELCOME_BACK
+    self._services.view.messageType = CONFIG.MESSAGE_WELCOME_BACK
     
     -- Запланировать возврат к MESSAGE_NORMAL режиму
-    self._view:ScheduleResetMessageType()
+    self._services.view:ScheduleResetMessageType()
 end
+
+
 
 --------------------------------------------------------------------------------
 --- @return table handlers
