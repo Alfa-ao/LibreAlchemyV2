@@ -195,6 +195,8 @@ function RecipeService:CreateRecipeCache()
 	end
 end
 
+
+
 --------------------------------------------------------------------------------
 --- Проверить, соответствуют ли доступные компоненты требованиям конкретного рецепта.
 --- @param recipe table структура рецепта из кэша (содержит componentsCount, requiredComponents).
@@ -231,6 +233,8 @@ function RecipeService:IsRecipeMatch( recipe, availableComponents, filledSlotsCo
 	return true
 end
 
+
+
 --------------------------------------------------------------------------------
 --- used AlchemySearchService:FindBestRecipes
 --- Отфильтровать глобальный кэш рецептов, оставляя только те, которым соответствуют
@@ -255,6 +259,8 @@ function RecipeService:FilterByComponents( availableComponents, filledDrumsCount
 	
 	return count
 end
+
+
 
 --------------------------------------------------------------------------------
 --- used AlchemyEvents:OnItemPlaced
