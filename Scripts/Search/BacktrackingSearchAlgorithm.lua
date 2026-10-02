@@ -32,6 +32,8 @@ function BacktrackingSearchAlgorithm:Init( evaluator )
 	self._evaluator = evaluator
 end
 
+
+
 --------------------------------------------------------------------------------
 --- @param totalCorrections number Доступное количество коррекций (сдвигов барабанов)
 --- @param linesAvailability table Доступность линий (строк) результата в интерфейсе алхимии (сдвиги -1, 0, 1)
