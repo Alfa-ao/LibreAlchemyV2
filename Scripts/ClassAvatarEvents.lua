@@ -27,15 +27,13 @@ function AvatarEvents:OnItemTaken( params )
     } )
     ------------------END-------------------
     
-    if params.actionType == EnumTakeItemActionType.CRAFT then
-        -- Информация о созданном предмете по его ID.
-        local info = itemLib.GetItemInfo( params.itemObject:GetId() )
-        if not info or not info.name then return end
-        -- Количество предметов в стаке.
-        local count = itemLib.GetStackInfo( params.itemObject:GetId() ).count
-        
-        self._view:ShowItemTaken( info.name, count )
-    end
+    -- Информация о созданном предмете по его ID.
+    local info = itemLib.GetItemInfo( params.itemObject:GetId() )
+    if not info or not info.name then return end
+    -- Количество предметов в стаке.
+    local count = itemLib.GetStackInfo( params.itemObject:GetId() ).count
+    
+    self._view:ShowItemTaken( info.name, count )
 end
 
 
@@ -46,7 +44,11 @@ end
 function AvatarEvents:GetActiveEventHandlers()
     return {
         { -- Всё что попало в сумку игрока от крафта алхимки.
-            function( params ) self:OnItemTaken( params ) end,
+            function( params )
+                if params.actionType == EnumTakeItemActionType.CRAFT and _G.mainForm:IsVisible() then
+                    self:OnItemTaken( params )
+                end
+            end,
             "EVENT_AVATAR_ITEM_TAKEN",
         },
     }
