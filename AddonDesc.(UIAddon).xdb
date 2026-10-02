@@ -13,22 +13,20 @@
 		<useCommonScripts>true</useCommonScripts>
 	</userAddonInfo>
 	<ScriptFileRefs>
-		<Item href="Libs/WidgetCoreExtends.lua"/>
-		
 		<!-- Config & State -->
 		<Item href="Scripts/Config.lua" />
 		<Item href="Scripts/State.lua" />
 		
 		<!-- Debug -->
-		<Item href="Libs/var_dump.lua" />
-		<Item href="Libs/DebugService.lua" />
+		<Item href="vendor/Alfa-ao/var_dump.lua" />
+		<Item href="vendor/Alfa-ao/DebugService.lua" />
 		
 		<!-- Enum -->
-		<Item href="Libs/Enum/src/EnumFactory.lua" />
-		<Item href="Libs/Enum/src/Definitions/TakeItemActionType.lua" />
+		<Item href="vendor/Alfa-ao/Enum/EnumFactory.lua" />
+		<Item href="vendor/Alfa-ao/Enum/Definitions/TakeItemActionType.lua" />
 		
 		<!-- Drag & Drop -->
-		<Item href="Libs/DND/src/DnDManager.lua" />
+		<Item href="vendor/Alfa-ao/DnDManager.lua" />
 		
 		<!-- Search Subsystem (Реализации поиска) -->
 		<Item href="Scripts/Search/RecipeEvaluator.lua" />
