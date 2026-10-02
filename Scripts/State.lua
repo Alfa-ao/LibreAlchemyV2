@@ -18,6 +18,8 @@ Global( "AlchemyState", {
     taskRefs = {}               -- table - Хранилище ссылок на запланированные отложенные вызовы.
 } )
 
+
+
 -- Отмена всех запланированных отложенных вызовов и очистка хранилища ссылок.
 function AlchemyState.CancelAllDelayedCalls()
     for _, functionRef in pairs( AlchemyState.taskRefs ) do
