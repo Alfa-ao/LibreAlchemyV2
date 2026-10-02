@@ -7,12 +7,16 @@ Class( "GUITextContainer" )
 
 --------------------------------------------------------------------------------
 --- Инициализация.
+--- @param wtParent Widget | TWidget
+--- @param name string 
 --------------------------------------------------------------------------------
 function GUITextContainer:Init( wtParent, name )
     self._wtParent = wtParent
     self._wtTextContainer = wtParent:GetChildChecked( name )
     advEvent.RegisterEventHandlers( false, self:GetActiveEventHandlers() )
 end
+
+
 
 --------------------------------------------------------------------------------
 --- Установить набор строк в текстовый контейнер.
@@ -30,6 +34,8 @@ function GUITextContainer:SetLines( ... )
     local exactHeight = self:GetExactTextHeight()
     self:UpdateSizePanel( exactHeight )
 end
+
+
 
 --------------------------------------------------------------------------------
 --- Динамически подстраивает размер Panel под переданную высоту текста + отступы.
@@ -49,12 +55,19 @@ function GUITextContainer:UpdateSizePanel( textHeight )
 
     -- Новый размер для Panel
     local panelPlc = self._wtParent:GetPlacementPlain()
-    -- Позицирование от центра: окно смещается вниз от центра Y
-    panelPlc.posY = panelPlc.posY - panelPlc.sizeY / 2 + targetSizeY / 2
+    
+    
+    if panelPlc.alignX == WIDGET_ALIGN_CENTER then
+        -- Позиционирование от центра: окно смещается вниз от центра Y
+        panelPlc.posY = panelPlc.posY - panelPlc.sizeY / 2 + targetSizeY / 2
+    end
+    
     panelPlc.sizeX = targetSizeX
     panelPlc.sizeY = targetSizeY
     self._wtParent:SetPlacementPlain( panelPlc )
 end
+
+
 
 --------------------------------------------------------------------------------
 --- Возвращает пиксельную высоту текстового контента.
@@ -69,6 +82,8 @@ function GUITextContainer:GetExactTextHeight()
     return contentPlc.posY + contentPlc.sizeY
 end
 
+
+
 --------------------------------------------------------------------------------
 --- Центрирует окно с подсказкой.
 --------------------------------------------------------------------------------
@@ -81,6 +96,8 @@ function GUITextContainer:UpdateCenterPanel()
     
     self._wtParent:SetPlacementPlain( plc )
 end
+
+
 
 --------------------------------------------------------------------------------
 --- @return table handlers
