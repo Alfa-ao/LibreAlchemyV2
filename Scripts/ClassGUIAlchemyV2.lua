@@ -27,6 +27,8 @@ function GUIAlchemyV2:Init( wtAlchemyV2 )
         GetChildChecked( "Name" )
 end
 
+
+
 --------------------------------------------------------------------------------
 -- Кастомный стиль окна с барабанами в АлхимкиV2
 --------------------------------------------------------------------------------
@@ -82,6 +84,8 @@ function GUIAlchemyV2:CustomStyle()
     plcRolls.highPosY = CONFIG.GUI.ROLLS_HIGH_POS_Y_OFFSET - CONFIG.GUI.ROLLS_EXTRA_SIZE
     self._wtRolls:SetPlacementPlain( plcRolls )
 end
+
+
 
 --------------------------------------------------------------------------------
 --- Получить имя рецепта, выбранного в AlchemyV2 (в меню варки).
