@@ -45,7 +45,7 @@ function AvatarEvents:GetActiveEventHandlers()
     return {
         { -- Всё что попало в сумку игрока от крафта алхимки.
             function( params )
-                if params.actionType == EnumTakeItemActionType.CRAFT and _G.mainForm:IsVisible() then
+                if EnumTakeItemActionType.CRAFT:Equals( params.actionType ) and mainForm:IsVisible() then
                     self:OnItemTaken( params )
                 end
             end,

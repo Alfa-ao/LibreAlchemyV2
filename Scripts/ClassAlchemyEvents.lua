@@ -22,7 +22,7 @@ end
 -- Срабатывает при открытии окна алхимии.
 --------------------------------------------------------------------------------
 function AlchemyEvents:OnStarted()
-    _G.mainForm:Show( true )
+    mainForm:Show( true )
 
     -- Создается кэш всех доступных рецептов.
     self._services.recipe:CreateRecipeCache()
@@ -49,7 +49,7 @@ end
 function AlchemyEvents:OnCanceled( params )
     -- Fix: 17.0.01.37 isSuccess (number(0/1))
     if not params.isSuccess or params.isSuccess == 0 then
-        _G.mainForm:Show( false )
+        mainForm:Show( false )
         self.reactionSuccess = false -- Сброс флага успешной реакции
         
         AlchemyState.CancelAllDelayedCalls()
@@ -162,7 +162,7 @@ function AlchemyEvents:OnRecipesChanged()
     self._services.recipe:ResetRecipeCache()
 	
 	-- Заглушка если алхимка не открыта, но взяли допустим рецепт из Айрина и добавили зелье в рецепт.
-	if not _G.mainForm:IsVisible() then return end
+	if not mainForm:IsVisible() then return end
 	
     -- Поздравить игрока.
     self._services.view:ShowCongratulation()

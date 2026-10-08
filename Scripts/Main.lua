@@ -29,11 +29,11 @@ alchemyV2:CustomStyle()
 -- Всё что связано с текстом (почти)
 --------------------------------------------------------------------------------
 local textContainer = GUITextContainer()
-textContainer:Init( _G.mainForm.wtPanel, "TextContainer" )
+textContainer:Init( mainForm.wtPanel, "TextContainer" )
 viewService:Init( common.GetLocalization(), alchemyV2, textContainer )
 
 viewService:UpdateCenterPanel()
-dndManager:Register( _G.mainForm.wtPanel, { saveToConfig = CONFIG.DND.SAVE } )
+dndManager:Register( mainForm.wtPanel, { saveToConfig = CONFIG.DND.SAVE } )
 
 --------------------------------------------------------------------------------
 -- Логика в событиях
