@@ -1,0 +1,58 @@
+{
+    "version": "v1",
+    "packages": [
+        {
+            "name": "DnDManager",
+            "type": "Library",
+            "execute": {
+                "unpack": [
+                    "src/DnDManager.lua",
+                    "src/DnDManagerExtends.lua"
+                ]
+            },
+            "files": {
+                "/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua": 100,
+                "/Mods/SampleCommon/CoreScripts/AddonBaseUserMods.lua": 98,
+                "/Mods/SampleCommon/CoreScripts/AddonBase.lua": 97,
+                "/Mods/SampleCommon/CoreScripts/WidgetCoreUserMods.lua": 96,
+                "/Mods/SampleCommon/CoreScripts/AdvancedHandlersUserMods.lua": 95,
+                "src/DnDManager.lua": 20
+            },
+            "tag": "Alfa-ao/DnDManager",
+            "version": "v1.2.1"
+        },
+        {
+            "name": "Enum",
+            "type": "Library",
+            "execute": {
+                "unpack": [
+                    "src/EnumFactory.lua",
+                    "src/Definitions/TakeItemActionType.lua"
+                ]
+            },
+            "files": {
+                "/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua": 100,
+                "src/EnumFactory.lua": 20,
+                "src/Definitions/TakeItemActionType.lua": 19
+            },
+            "tag": "Alfa-ao/Enum",
+            "version": "v1.1.0"
+        },
+        {
+            "name": "Debug",
+            "type": "Library",
+            "execute": {
+                "unpack": [
+                    "DebugService.lua"
+                ]
+            },
+            "files": {
+                "DebugService.lua": 20,
+                "/Mods/SampleCommon/CoreScripts/AddonBaseUserMods.lua": 100,
+                "/Mods/SampleCommon/CoreScripts/AddonBase.lua": 100
+            },
+            "tag": "Alfa-ao/DebugService",
+            "version": "v1.0.0"
+        }
+    ]
+}

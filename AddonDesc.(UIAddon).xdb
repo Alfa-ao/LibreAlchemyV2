@@ -1,69 +1,51 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <UIAddon>
-	<Name>LibreAlchemyV2</Name>
-	<AutoStart>true</AutoStart>
-	<Form href="Widgets/LibreAlchemyV2.(WidgetForm).xdb" />
-	<userAddonInfo>
-		<name href="AddonName.txt" />
-		<description href="AddonDescription.txt" />
-		<author>Alfa-ao</author>
-		<version>2.4.0</version>
-		<apiVersion>18000000</apiVersion>
-		<buildTime>0</buildTime>
-		<useCommonScripts>true</useCommonScripts>
-	</userAddonInfo>
-	<ScriptFileRefs>
-		<!-- Config & State -->
-		<Item href="Scripts/Config.lua" />
-		<Item href="Scripts/State.lua" />
-		
-		<!-- Debug -->
-		<Item href="vendor/Alfa-ao/var_dump.lua" />
-		<Item href="vendor/Alfa-ao/DebugService.lua" />
-		
-		<!-- Enum -->
-		<Item href="vendor/Alfa-ao/Enum/EnumFactory.lua" />
-		<Item href="vendor/Alfa-ao/Enum/Definitions/TakeItemActionType.lua" />
-		
-		<!-- Drag & Drop -->
-		<Item href="vendor/Alfa-ao/DnDManager.lua" />
-		
-		<!-- Search Subsystem (Реализации поиска) -->
-		<Item href="Scripts/Search/RecipeEvaluator.lua" />
-		<Item href="Scripts/Search/DrumShiftMapper.lua" />
-		<Item href="Scripts/Search/BacktrackingSearchAlgorithm.lua" />
-		
-		<!-- Services (Сервисы) -->
-		<Item href="Scripts/ClassRecipeService.lua" />
-		<Item href="Scripts/ClassSearchService.lua" />
-		<Item href="Scripts/ClassViewService.lua" />
-		
-		<!-- GUI -->
-		<Item href="Scripts/ClassGUIAlchemyV2.lua" />
-		<Item href="Scripts/ClassGUITextContainer.lua" />
-		
-		<!-- Events -->
-		<Item href="Scripts/ClassAlchemyEvents.lua" />
-		<Item href="Scripts/ClassAvatarEvents.lua" />
-		
-		<!-- Init -->
-		<Item href="Scripts/Main.lua" />
-	</ScriptFileRefs>
-	<textsGroups>
-		<Item>
-			<groupName>rus</groupName>
-			<texts href="Locales/lang/rus/Locale.(UIRelatedTexts).xdb"/>
-		</Item>
-		<Item>
-			<groupName>eng</groupName>
-			<texts href="Locales/lang/eng/Locale.(UIRelatedTexts).xdb"/>
-		</Item>
-		<Item>
-			<groupName>template</groupName>
-			<texts href="Locales/template/Locale.(UIRelatedTexts).xdb"/>
-		</Item>
-	</textsGroups>
-	<styleSheets>
-		<Item href="Widgets/Styles.(WidgetCss).xdb" />
-	</styleSheets>
+    <Name>LibreAlchemyV2</Name>
+    <AutoStart>true</AutoStart>
+    <Form href="Widgets/LibreAlchemyV2.(WidgetForm).xdb" />
+    <userAddonInfo>
+        <name href="AddonName.txt" />
+        <description href="AddonDescription.txt" />
+        <author>Alfa-ao</author>
+        <version>2.4.0</version>
+        <apiVersion>18000000</apiVersion>
+        <buildTime>0</buildTime>
+        <useCommonScripts>true</useCommonScripts>
+    </userAddonInfo>
+    <ScriptFileRefs>
+        <Item href="Scripts/Config.lua" />
+        <Item href="Packages/Alfa-ao/DnDManager/src/DnDManager.lua" />
+        <Item href="Packages/Alfa-ao/Enum/src/EnumFactory.lua" />
+        <Item href="Packages/Alfa-ao/Debug/DebugService.lua" />
+        <Item href="Packages/Alfa-ao/Enum/src/Definitions/TakeItemActionType.lua" />
+        <Item href="Scripts/State.lua" />
+        <Item href="Scripts/Search/RecipeEvaluator.lua" />
+        <Item href="Scripts/Search/DrumShiftMapper.lua" />
+        <Item href="Scripts/Search/BacktrackingSearchAlgorithm.lua" />
+        <Item href="Scripts/ClassRecipeService.lua" />
+        <Item href="Scripts/ClassSearchService.lua" />
+        <Item href="Scripts/ClassViewService.lua" />
+        <Item href="Scripts/ClassGUIAlchemyV2.lua" />
+        <Item href="Scripts/ClassGUITextContainer.lua" />
+        <Item href="Scripts/ClassAlchemyEvents.lua" />
+        <Item href="Scripts/ClassAvatarEvents.lua" />
+        <Item href="Scripts/Main.lua" />
+    </ScriptFileRefs>
+    <textsGroups>
+        <Item>
+            <groupName>rus</groupName>
+            <texts href="Locales/lang/rus/Locale.(UIRelatedTexts).xdb" />
+        </Item>
+        <Item>
+            <groupName>eng</groupName>
+            <texts href="Locales/lang/eng/Locale.(UIRelatedTexts).xdb" />
+        </Item>
+        <Item>
+            <groupName>template</groupName>
+            <texts href="Locales/template/Locale.(UIRelatedTexts).xdb" />
+        </Item>
+    </textsGroups>
+    <styleSheets>
+        <Item href="Widgets/Styles.(WidgetCss).xdb" />
+    </styleSheets>
 </UIAddon>

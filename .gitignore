@@ -3,4 +3,3 @@ exclude*
 out*.txt
 test
 var_dump.lua
-vendor
