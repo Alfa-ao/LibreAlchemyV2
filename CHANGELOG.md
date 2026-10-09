@@ -16,20 +16,19 @@
 
 ### Changed
 
-- DnD `DnDManager`: Менеджер обновлён до версии `v1.2.0`.
+- Библиотека `DnDManager`: Менеджер обновлён до версии `v1.2.0`.
 - События: переход с `common.RegisterEventHandler` на `advEvent.RegisterEventHandlers`. Формат таблицы событий изменён с `{ [eventName] = handler }` на массив `{ { handler, eventName }, ... }`.
-- Локализация: упразднён `AlchemyRelatedTextService`. Получение текстовых ресурсов теперь выполняется напрямую через глобальную функцию `GetAddonText( sysGroup, sysName, optional )`. Локализация сохраняется в `AlchemyState.localization` при инициализации.
+- Локализация: упразднён `AlchemyRelatedTextService`. Получение текстовых ресурсов теперь выполняется через функцию `GetAddonText( sysGroup, sysName, optional )`. Локализация сохраняется в `AlchemyState.localization` при инициализации.
 - Утилиты: упразднён `MathUtils`. `MathUtils.shallowCopy` заменён на встроенный `table.sclone`. `MathUtils.safeModulo` заменён на стандартный оператор `%` с использованием `drumSize` из состояния.
-- Рецепты `AlchemyRecipeService`: удалён кэш строковых имён компонентов `_componentNamesCache`, `GetComponentName`. Рецепты теперь хранят и сравнивают компоненты по `ComponentPropertyId` (userdata) напрямую, без конвертации в строку. Сохранение `drumSize` из `GetAlchemyInfo`. Метод `IsRecipeMatch` учитывает флаг `CONFIG.REQUIRED_COMPONENTS_COUNT`.
-- Поиск `DrumShiftMapper`: упрощена инициализация - убрана зависимость от `AlchemyRecipeService`. Карта сдвигов строится по `ComponentPropertyId` напрямую. Используется `state.drumSize` вместо `GetTableSize`.
+- Рецепты `AlchemyRecipeService`: удалён кэш строковых имён компонентов `_componentNamesCache`, `GetComponentName`. Рецепты теперь хранят и сравнивают компоненты по `ComponentPropertyId` (userdata), без конвертации в строку. Сохранение `drumSize` из `GetAlchemyInfo`. Метод `IsRecipeMatch` учитывает флаг `CONFIG.REQUIRED_COMPONENTS_COUNT`.
+- Поиск `DrumShiftMapper`: упрощена инициализация - убрана зависимость от `AlchemyRecipeService`. Карта сдвигов строится по `ComponentPropertyId`. Используется `state.drumSize` вместо `GetTableSize`.
 - Поиск `BacktrackingSearchAlgorithm`: `MathUtils.shallowCopy` заменён на `table.sclone`.
 - View `AlchemyViewService`: инициализация принимает `state` вместо отдельных `locale` и `template`. Все вызовы `self._locale:Get()` / `self._template:Get()` заменены на `GetAddonText()`.
 - GUI `WidgetTextContainer`: `Init()` больше не принимает параметров - отступ берётся из `CONFIG.GUI.PADDING`. `UpdateCenterPanel()` упрощён: позиция рассчитывается через `CONFIG.GUI.POS_X` и `CONFIG.GUI.SIZE_Y`.
-- Debug `DebugService`: улучшена обработка `WString` при отсутствии `var_dump` - используется `userMods.FromWString`. Глобальная функция `log` использует `LogInfo` вместо `common.LogInfo`.
 - `Panel.(WidgetPanel).xdb`: выравнивание изменено на `WIDGET_ALIGN_CENTER` по обеим осям, начальные размеры и позиции обнулены (управляются из Lua).
 - `ouText.(WidgetTextContainer).xdb`: ширина уменьшена с `570` до `533`.
 - `AddonDesc.(UIAddon).xdb`: подключены дополнительные CoreScripts (`AddonBaseUserMods`, `AddonBase`, `WidgetCoreUserMods`, `AdvancedHandlersUserMods`).
-- Позицирование: изменена логика позицирования виджета подсказки. Теперь корректно отображается при масштабировании.
+- Позиционирование: изменена логика позиционирования виджета подсказки. Теперь корректно отображается при масштабировании.
 
 ### Removed
 
