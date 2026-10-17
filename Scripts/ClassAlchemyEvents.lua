@@ -4,7 +4,7 @@
 --------------------------------------------------------------------------------
 
 Class( "AlchemyEvents", {
-    reactionSuccess = false -- true: чтобы при получении предмета показать поздравление с кол-вом полученного предмета.
+    _reactionSuccess = false -- true: чтобы при получении предмета показать поздравление с кол-вом полученного предмета.
 } )
 
 --------------------------------------------------------------------------------
@@ -12,7 +12,8 @@ Class( "AlchemyEvents", {
 --------------------------------------------------------------------------------
 function AlchemyEvents:Init( services )
     self._services = services
-    advEvent.RegisterEventHandlers( false, self:GetActiveEventHandlers() )
+    
+    advEvent.RegisterEventHandlers( false, self:GetEventHandlers() )
 end
 
 
@@ -50,7 +51,7 @@ function AlchemyEvents:OnCanceled( params )
     -- Fix: 17.0.01.37 isSuccess (number(0/1))
     if not params.isSuccess or params.isSuccess == 0 then
         mainForm:Show( false )
-        self.reactionSuccess = false -- Сброс флага успешной реакции
+        self._reactionSuccess = false -- Сброс флага успешной реакции
         
         AlchemyState.CancelAllDelayedCalls()
         
@@ -75,7 +76,7 @@ end
 --------------------------------------------------------------------------------
 function AlchemyEvents:OnItemPlaced( params )
     if not params.placed then
-        self.reactionSuccess = false
+        self._reactionSuccess = false
     end
     
     -----------------DEBUG------------------
@@ -100,7 +101,7 @@ function AlchemyEvents:OnItemPlaced( params )
         AlchemyState.taskRefs.funcAlchemyItemPlaced = nil
         
         -- Если находимся в меню, то показывает "Возможно N рецептов"
-        if not self.reactionSuccess then
+        if not self._reactionSuccess then
             -- Кол-во возможных рецептов (countRecipe) и кол-во требуемых слотов (filledDrumsCount)
             local countRecipe, filledDrumsCount = self._services.recipe:CountPotential()
             
@@ -136,14 +137,14 @@ function AlchemyEvents:OnReactionFinished()
         -----------------DEBUG------------------
         DebugService.LogReaction( "EVENT_ALCHEMY_REACTION_FINISHED:{empty}" )
         ------------------END-------------------
-        self.reactionSuccess = false
+        self._reactionSuccess = false
     else
         -----------------DEBUG------------------
         DebugService.LogReaction( function()
             return self._services.view:ResultsForLog( found, CONFIG.MAX_DISPLAY_RESULTS, AlchemyState.drumsCount )
         end )
         ------------------END-------------------
-        self.reactionSuccess = true
+        self._reactionSuccess = true
     end
 end
 
@@ -180,7 +181,7 @@ end
 --------------------------------------------------------------------------------
 --- @return table handlers
 --------------------------------------------------------------------------------
-function AlchemyEvents:GetActiveEventHandlers()
+function AlchemyEvents:GetEventHandlers()
     return {
         { -- Окно алхимки открывается. Инициализируется HELLO сообщение и кэш рецептов.
             function() self:OnStarted() end,
