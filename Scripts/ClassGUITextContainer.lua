@@ -13,7 +13,8 @@ Class( "GUITextContainer" )
 function GUITextContainer:Init( wtParent, name )
     self._wtParent = wtParent
     self._wtTextContainer = wtParent:GetChildChecked( name )
-    advEvent.RegisterEventHandlers( false, self:GetActiveEventHandlers() )
+    
+    advEvent.RegisterEventHandlers( false, self:GetEventHandlers() )
 end
 
 
@@ -102,7 +103,7 @@ end
 --------------------------------------------------------------------------------
 --- @return table handlers
 --------------------------------------------------------------------------------
-function GUITextContainer:GetActiveEventHandlers()
+function GUITextContainer:GetEventHandlers()
     return {
         { -- Обновляет размеры Panel при изменении масштаба/размера окна игры.
             function()
