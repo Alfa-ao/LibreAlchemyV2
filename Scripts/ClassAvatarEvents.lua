@@ -10,7 +10,8 @@ Class( "AvatarEvents" )
 --------------------------------------------------------------------------------
 function AvatarEvents:Init( view )
     self._view = view
-    advEvent.RegisterEventHandlers( false, self:GetActiveEventHandlers() )
+    
+    advEvent.RegisterEventHandlers( false, self:GetEventHandlers() )
 end
 
 
@@ -41,7 +42,7 @@ end
 --------------------------------------------------------------------------------
 --- @return table handlers
 --------------------------------------------------------------------------------
-function AvatarEvents:GetActiveEventHandlers()
+function AvatarEvents:GetEventHandlers()
     return {
         { -- Всё что попало в сумку игрока от крафта алхимки.
             function( params )
