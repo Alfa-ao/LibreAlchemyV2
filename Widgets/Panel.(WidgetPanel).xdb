@@ -5,7 +5,7 @@
     <Children>
         <Item href="Text/TextContainer.(WidgetTextContainer).xdb" />
     </Children>
-    <BackLayer href="Text/Textures/Tooltip.(WidgetLayerTiledTexture).xdb" />
+    <BackLayer href="../Textures/Background/Background.(WidgetLayerTiledTexture).xdb" />
     <Placement>
         <X>
             <Align>WIDGET_ALIGN_CENTER</Align>

@@ -11,6 +11,6 @@
 	<disableLODControl>false</disableLODControl>
 	<alphaTex>true</alphaTex>
 	<binaryFileSize>653</binaryFileSize>
-	<binaryFile href="Tooltip.(UITexture).bin" />
+	<binaryFile href="Background.(UITexture).bin" />
 	<wrap>false</wrap>
 </UITexture>

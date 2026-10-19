@@ -1,12 +1,19 @@
 --------------------------------------------------------------------------------
--- ClassGUITextContainer.lua
--- Обвертка для управления текстовым контейнером (TextContainer) и его родителем.
+--[[
+ClassGUITextContainer.lua - Обвертка для управления текстовым контейнером (TextContainer) и его родителем (Panel).
+
+Класс GUITextContainer реализует следующие методы:
+    self.Init
+    self.SetLines           - Устанавливает набор строк в текстовый контейнер. Полностью очищает контейнер перед добавлением.
+    self.UpdateSizePanel    - Обновляет размер Panel под высоту текста + отступы.
+    self.PosCenterPanel     - Центрирует окно с подсказкой.
+    self.GetEventHandlers   - EVENT_POS_CONVERTER_CHANGED
+]]
 --------------------------------------------------------------------------------
 
 Class( "GUITextContainer" )
 
 --------------------------------------------------------------------------------
---- Инициализация.
 --- @param wtParent Widget | TWidget
 --- @param name string 
 --------------------------------------------------------------------------------
@@ -14,14 +21,10 @@ function GUITextContainer:Init( wtParent, name )
     self._wtParent = wtParent
     self._wtTextContainer = wtParent:GetChildChecked( name )
     
-    advEvent.RegisterEventHandlers( false, self:GetEventHandlers() )
+    advEvent.RegisterEventHandlers( self, self:GetEventHandlers() )
 end
 
-
-
 --------------------------------------------------------------------------------
---- Установить набор строк в текстовый контейнер.
---- Полностью очищает контейнер перед добавлением новых строк.
 --- @param ... ValuedText | WString | string
 --------------------------------------------------------------------------------
 function GUITextContainer:SetLines( ... )
@@ -31,19 +34,15 @@ function GUITextContainer:SetLines( ... )
 		self._wtTextContainer:PushBackText( line )
 	end
 	
-    -- Выдать высоту текста и подстроить под него сам Panel
-    local exactHeight = self:GetExactTextHeight()
-    self:UpdateSizePanel( exactHeight )
+    self:UpdateSizePanel()
 end
 
-
-
 --------------------------------------------------------------------------------
---- Динамически подстраивает размер Panel под переданную высоту текста + отступы.
---- @param textHeight number
---------------------------------------------------------------------------------
-function GUITextContainer:UpdateSizePanel( textHeight )
-    -- Новый отступ от Panel для ouText
+function GUITextContainer:UpdateSizePanel()
+    self._wtTextContainer:ForceReposition()
+    
+    local contentPlc = self._wtTextContainer.wt__Border.wt__Content:GetPlacementPlain()
+    
     local ouTextPlc = self._wtTextContainer:GetPlacementPlain()
     ouTextPlc.posX = CONFIG.GUI.PADDING
     ouTextPlc.posY = CONFIG.GUI.PADDING
@@ -52,7 +51,7 @@ function GUITextContainer:UpdateSizePanel( textHeight )
     -- Ширина: отступ слева (posX) и справа + фиксированная ширина текста
     local targetSizeX = CONFIG.GUI.PADDING * 2 + ouTextPlc.sizeX
     -- Высота: отступ сверху (posY) и снизу + высота текста
-    local targetSizeY = CONFIG.GUI.PADDING * 2 + textHeight
+    local targetSizeY = CONFIG.GUI.PADDING * 2 + contentPlc.posY + contentPlc.sizeY
 
     -- Новый размер для Panel
     local panelPlc = self._wtParent:GetPlacementPlain()
@@ -68,27 +67,8 @@ function GUITextContainer:UpdateSizePanel( textHeight )
     self._wtParent:SetPlacementPlain( panelPlc )
 end
 
-
-
 --------------------------------------------------------------------------------
---- Возвращает пиксельную высоту текстового контента.
---- Использует внутренний ouText -> __Border -> __Content.
---- @return number
---------------------------------------------------------------------------------
-function GUITextContainer:GetExactTextHeight()
-    self._wtTextContainer:ForceReposition()
-    
-    local content = self._wtTextContainer.wt__Border.wt__Content
-    local contentPlc = content:GetPlacementPlain()
-    return contentPlc.posY + contentPlc.sizeY
-end
-
-
-
---------------------------------------------------------------------------------
---- Центрирует окно с подсказкой.
---------------------------------------------------------------------------------
-function GUITextContainer:UpdateCenterPanel()
+function GUITextContainer:PosCenterPanel()
     local pco = common.GetPosConverterParams()
     local plc = self._wtParent:GetPlacementPlain()
     
@@ -98,18 +78,13 @@ function GUITextContainer:UpdateCenterPanel()
     self._wtParent:SetPlacementPlain( plc )
 end
 
-
-
 --------------------------------------------------------------------------------
 --- @return table handlers
 --------------------------------------------------------------------------------
 function GUITextContainer:GetEventHandlers()
     return {
         { -- Обновляет размеры Panel при изменении масштаба/размера окна игры.
-            function()
-                local exactHeight = self:GetExactTextHeight()
-                self:UpdateSizePanel( exactHeight )
-            end,
+            self.UpdateSizePanel,
             "EVENT_POS_CONVERTER_CHANGED"
         },
     }

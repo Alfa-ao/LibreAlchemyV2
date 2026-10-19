@@ -3,20 +3,14 @@
 --------------------------------------------------------------------------------
 DebugService.Init { General = CONFIG.DEBUG, Reaction = CONFIG.DEBUG_REACTION }
 
-local recipeService = RecipeService() -- Лёгкий подсчёт возможных рецептов
-local searchService = SearchService() -- Глубокий поиск
 local viewService = ViewService() -- Управление виджетом подсказки
+local recipeService = RecipeService() -- подсчёт возможных рецептов
+local searchService = SearchService() -- поиск и сопоставление карты
+searchService:Init( recipeService )
 
 -- Перетаскивание виджета
 local dndManager = DnDManager()
 dndManager:Init { defaultCursor = CONFIG.DND.CURSOR }
-
---------------------------------------------------------------------------------
--- Search
---------------------------------------------------------------------------------
-local searchAlgorithm = BacktrackingSearchAlgorithm()
-searchAlgorithm:Init( RecipeEvaluator() )
-searchService:Init( recipeService, DrumShiftMapper(), searchAlgorithm )
 
 --------------------------------------------------------------------------------
 -- Всё что изменяется кастомно внутри окна AlchemyV2
@@ -32,20 +26,15 @@ local textContainer = GUITextContainer()
 textContainer:Init( mainForm.wtPanel, "TextContainer" )
 viewService:Init( common.GetLocalization(), alchemyV2, textContainer )
 
-viewService:UpdateCenterPanel()
-dndManager:Register( mainForm.wtPanel, { saveToConfig = CONFIG.DND.SAVE } )
+textContainer:PosCenterPanel()
+--dndManager:Register( mainForm.wtPanel, { saveToConfig = CONFIG.DND.SAVE } )
 
 --------------------------------------------------------------------------------
 -- Логика в событиях
 --------------------------------------------------------------------------------
--- EVENT_ALCHEMY_*
-local alchemyEvents = AlchemyEvents()
-alchemyEvents:Init {
+local events = EventHandlers()
+events:Init {
     view = viewService,
     search = searchService,
     recipe = recipeService,
 }
-
--- EVENT_AVATAR_*
-local avatarEvents = AvatarEvents()
-avatarEvents:Init( viewService )

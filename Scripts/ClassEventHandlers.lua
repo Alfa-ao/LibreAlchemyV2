@@ -1,28 +1,36 @@
 --------------------------------------------------------------------------------
--- ClassAlchemyEvents.lua
--- Класс, отвечающий за обработку событий алхимии (EVENT_ALCHEMY_*).
+--[[
+ClassEventHandlers.lua - Сервис для обработки событий.
+
+Класс EventHandlers реализует следующие методы:
+    self.Init
+    self.OnStarted          - Обработка EVENT_ALCHEMY_STARTED. Открытие окна алхимии.
+    self.OnCanceled         - Обработка EVENT_ALCHEMY_CANCELED. Закрытие окна алхимии или выход в меню рецептов.
+    self.OnItemPlaced       - Обработка EVENT_ALCHEMY_ITEM_PLACED. Размещение или извлечение предмета из слота.
+    self.OnReactionFinished - Обработка EVENT_ALCHEMY_REACTION_FINISHED. Запуск процесса варки зелья.
+    self.OnRecipesChanged   - Обработка EVENT_ALCHEMY_RECIPES_CHANGED. Изменение списка доступных рецептов.
+    self.OnItemTaken        - Обработка EVENT_AVATAR_ITEM_TAKEN. Получение предмета в инвентарь.
+    self.CancelDelayedCalls - Отмена всех запланированных отложенных вызовов.
+    self.GetEventHandlers   - Получение списка обработчиков для регистрации в системе событий.
+]]
 --------------------------------------------------------------------------------
 
-Class( "AlchemyEvents", {
-    _reactionSuccess = false -- true: чтобы при получении предмета показать поздравление с кол-вом полученного предмета.
+Class( "EventHandlers", {
+    _reactionSuccess = false, -- true: чтобы при получении предмета показать поздравление с кол-вом полученного предмета.
+    _taskRefItemPlaced = nil,
 } )
 
 --------------------------------------------------------------------------------
 --- @param services table
 --------------------------------------------------------------------------------
-function AlchemyEvents:Init( services )
+function EventHandlers:Init( services )
     self._services = services
     
-    advEvent.RegisterEventHandlers( false, self:GetEventHandlers() )
+    advEvent.RegisterEventHandlers( self, self:GetEventHandlers() )
 end
 
-
-
 --------------------------------------------------------------------------------
--- Обработчик события EVENT_ALCHEMY_STARTED.
--- Срабатывает при открытии окна алхимии.
---------------------------------------------------------------------------------
-function AlchemyEvents:OnStarted()
+function EventHandlers:OnStarted()
     mainForm:Show( true )
 
     -- Создается кэш всех доступных рецептов.
@@ -38,22 +46,17 @@ function AlchemyEvents:OnStarted()
     self._services.view:ScheduleResetMessageType()
 end
 
-
-
 --------------------------------------------------------------------------------
---- Обработчик события EVENT_ALCHEMY_CANCELED.
---- Срабатывает при закрытии окна алхимии или переход в меню рецептов.
---- true: вышли в меню рецептов.
---- false: закрыли окно алхимии и при прерывании (не забрал результат).
 --- @param params table { isSuccess: boolean }
 --------------------------------------------------------------------------------
-function AlchemyEvents:OnCanceled( params )
+function EventHandlers:OnCanceled( params )
     -- Fix: 17.0.01.37 isSuccess (number(0/1))
     if not params.isSuccess or params.isSuccess == 0 then
         mainForm:Show( false )
         self._reactionSuccess = false -- Сброс флага успешной реакции
         
-        AlchemyState.CancelAllDelayedCalls()
+        self:CancelDelayedCalls()
+        self._services.view:CancelDelayedCalls()
         
         -- При следующем открытии покажет сообщение "С возвращением!"
         self._services.view.messageType = CONFIG.MESSAGE_WELCOME_BACK
@@ -67,14 +70,10 @@ function AlchemyEvents:OnCanceled( params )
     ------------------END-------------------
 end
 
-
-
 --------------------------------------------------------------------------------
---- Обработчик события EVENT_ALCHEMY_ITEM_PLACED.
---- Срабатывает при размещении или извлечении предмета из слота рецепта.
 --- @param params table { placed: boolean, slot: number }
 --------------------------------------------------------------------------------
-function AlchemyEvents:OnItemPlaced( params )
+function EventHandlers:OnItemPlaced( params )
     if not params.placed then
         self._reactionSuccess = false
     end
@@ -90,82 +89,64 @@ function AlchemyEvents:OnItemPlaced( params )
     )
     ------------------END-------------------
     
-    -- Если сейчас не стандартный режим отображения, то текст не обновляется.
-    -- Автоматически переключится через {CONFIG.DELAY_MS_UPDATE}.
+    -- Блокировка для дальнейшего этапа показа сообщения. Переключится через {CONFIG.DELAY_MS_UPDATE}.
     if self._services.view.messageType ~= CONFIG.MESSAGE_NORMAL then
         return
     end
     
-    
     local function funcGetMessage()
-        AlchemyState.taskRefs.funcAlchemyItemPlaced = nil
+        self._taskRefItemPlaced = nil
         
-        -- Если находимся в меню, то показывает "Возможно N рецептов"
         if not self._reactionSuccess then
             -- Кол-во возможных рецептов (countRecipe) и кол-во требуемых слотов (filledDrumsCount)
             local countRecipe, filledDrumsCount = self._services.recipe:CountPotential()
-            
             self._services.view:ShowPotentialRecipes( countRecipe, filledDrumsCount )
+            
             -----------------DEBUG------------------
             DebugService.LogGeneral( { "ShowPotentialRecipes:", countRecipe } )
             ------------------END-------------------
         end
     end
     
-    -- Отменяется предыдущий таймер, если он уже был запланирован
-    if AlchemyState.taskRefs.funcAlchemyItemPlaced ~= nil then
-        common.CancelDelayedCall( AlchemyState.taskRefs.funcAlchemyItemPlaced )
+    -- Отмена предыдущего таймера
+    if self._taskRefItemPlaced then
+        common.CancelDelayedCall( self._taskRefItemPlaced )
     end
-
-    -- Запланировать новый отложенный вызов и сохранить его идентификатор
-    AlchemyState.taskRefs.funcAlchemyItemPlaced = common.DelayedCall( CONFIG.DELAY_MS_UPDATE, funcGetMessage )
+	
+    self._taskRefItemPlaced = common.DelayedCall( CONFIG.DELAY_MS_UPDATE, funcGetMessage )
 end
 
-
-
 --------------------------------------------------------------------------------
--- Обработчик события EVENT_ALCHEMY_REACTION_FINISHED.
--- Срабатывает сразу после начала процесса варки (нажатие кнопки "варить").
---------------------------------------------------------------------------------
-function AlchemyEvents:OnReactionFinished()
-    -- Запускается алгоритм поиска подходящих рецептов
-    local found = self._services.search:FindBestRecipes()
-    self._services.view:ShowReactionResults( found, CONFIG.MAX_DISPLAY_RESULTS, AlchemyState.drumsCount )
+function EventHandlers:OnReactionFinished()
+    local found = self._services.search:FindBestRecipes() -- (HELP) постоянно пустая таблица {}
+    local drumsCount = avatar.GetAlchemyInfo().drumsCount
     
-    -- Если ничего не найдено
+    self._services.view:ShowReactionResults( found, CONFIG.MAX_DISPLAY_RESULTS, drumsCount )
+    
     if #found == 0 then
-        -----------------DEBUG------------------
+        -- Бормотуха
+		-----------------DEBUG------------------
         DebugService.LogReaction( "EVENT_ALCHEMY_REACTION_FINISHED:{empty}" )
         ------------------END-------------------
-        self._reactionSuccess = false
     else
-        -----------------DEBUG------------------
+		-----------------DEBUG------------------
         DebugService.LogReaction( function()
-            return self._services.view:ResultsForLog( found, CONFIG.MAX_DISPLAY_RESULTS, AlchemyState.drumsCount )
+            return self._services.view:ResultsForLog( found, CONFIG.MAX_DISPLAY_RESULTS, drumsCount )
         end )
         ------------------END-------------------
-        self._reactionSuccess = true
     end
+    
+    self._reactionSuccess = true
 end
 
-
-
 --------------------------------------------------------------------------------
--- Обработчик события EVENT_ALCHEMY_RECIPES_CHANGED.
--- Срабатывает, когда список рецептов изменился.
---------------------------------------------------------------------------------
-function AlchemyEvents:OnRecipesChanged()
+function EventHandlers:OnRecipesChanged()
     -----------------DEBUG------------------
     DebugService.LogGeneral( "EVENT_ALCHEMY_RECIPES_CHANGED" )
     ------------------END-------------------
     
-    -- Сбрасывается кэш рецептов для обновления
     self._services.recipe:ResetRecipeCache()
-	
-	-- Заглушка если алхимка не открыта, но взяли допустим рецепт из Айрина и добавили зелье в рецепт.
 	if not mainForm:IsVisible() then return end
-	
-    -- Поздравить игрока.
     self._services.view:ShowCongratulation()
     
     -- Отрубить сообщения в EVENT_ALCHEMY_ITEM_PLACED
@@ -176,32 +157,66 @@ function AlchemyEvents:OnRecipesChanged()
     self._services.view:ScheduleResetMessageType()
 end
 
+--------------------------------------------------------------------------------
+--- @param params table { actionType: string, itemObject: ValuedObjectLua }
+--------------------------------------------------------------------------------
+function EventHandlers:OnItemTaken( params )
+    if not ( EnumTakeItemActionType.CRAFT:Equals( params.actionType ) and mainForm:IsVisible() ) then
+        return
+    end
+    
+    -----------------DEBUG------------------
+    DebugService.LogGeneral( "EVENT_AVATAR_ITEM_TAKEN", { 
+        "params: { actionType: string, itemObject: ValuedObjectLua }", params 
+    } )
+    ------------------END-------------------
+    
+    -- Информация о созданном предмете по его ID.
+    local info = itemLib.GetItemInfo( params.itemObject:GetId() )
+    if not info or not info.name then return end
+    -- Количество предметов в стаке.
+    local count = itemLib.GetStackInfo( params.itemObject:GetId() ).count
+    
+    self._services.view:ShowItemTaken( info.name, count )
+end
 
+--------------------------------------------------------------------------------
+function EventHandlers:CancelDelayedCalls()
+    if self._taskRefItemPlaced ~= nil then
+        common.CancelDelayedCall( self._taskRefItemPlaced )
+        self._taskRefItemPlaced = nil
+    end
+end
 
 --------------------------------------------------------------------------------
 --- @return table handlers
 --------------------------------------------------------------------------------
-function AlchemyEvents:GetEventHandlers()
+function EventHandlers:GetEventHandlers()
     return {
-        { -- Окно алхимки открывается. Инициализируется HELLO сообщение и кэш рецептов.
-            function() self:OnStarted() end,
+        { -- Окно алхимки открывается.
+            self.OnStarted,
             "EVENT_ALCHEMY_STARTED"
         },
         { -- Окно алхимки закрывается / вышли из варки в меню.
-            function( params ) self:OnCanceled( params ) end,
+            self.OnCanceled,
             "EVENT_ALCHEMY_CANCELED"
         },
         { -- При каждом изменении слота для компонентов уведомляет, что в такой-то слот был вставлен/вынут компонент.
-            function( params ) self:OnItemPlaced( params ) end,
+            self.OnItemPlaced,
             "EVENT_ALCHEMY_ITEM_PLACED"
         },
-        { -- Уведомляет о начале(финиширует, но проигрывается анимация интерфейса) варки зелья.
-            function() self:OnReactionFinished() end,
+        { -- Уведомляет о начале (финиширует, но проигрывается анимация интерфейса) варки зелья.
+            self.OnReactionFinished,
             "EVENT_ALCHEMY_REACTION_FINISHED"
         },
         { -- Уведомляет об необходимости обновить список рецептов.
-            function() self:OnRecipesChanged() end,
+            self.OnRecipesChanged,
             "EVENT_ALCHEMY_RECIPES_CHANGED"
+        },
+        
+        { -- Всё что попало в сумку игрока от крафта алхимки.
+            self.OnItemTaken,
+            "EVENT_AVATAR_ITEM_TAKEN",
         },
     }
 end

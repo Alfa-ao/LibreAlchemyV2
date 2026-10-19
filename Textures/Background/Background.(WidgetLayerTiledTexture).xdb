@@ -4,7 +4,7 @@
 	<Grayed>false</Grayed>
 	<BlendEffect>BLEND_EFFECT_ALPHABLND</BlendEffect>
 	<flatPlacement>false</flatPlacement>
-	<textureItem href="Tooltip.(UISingleTexture).xdb" />
+	<textureItem href="Background.(UISingleTexture).xdb" />
 	<Layout>
 		<LeftX>26</LeftX>
 		<MiddleX>32</MiddleX>

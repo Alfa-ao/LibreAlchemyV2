@@ -17,21 +17,9 @@
 			<Pos>15</Pos>
 		</Y>
 	</Placement>
-	
-	<!-- Отключаем обрезку, чтобы текст не скрылся при ресайзинге -->
 	<clipContent>false</clipContent>
 	
 	<widgetsArrangement>WIDGETS_ARRANGEMENT_T2B</widgetsArrangement>
-	<!-- 
-	<widgetsArrangement>WIDGETS_ARRANGEMENT_T2B</widgetsArrangement>
-	WidgetsArrangement - это enum, указывающий направление или порядок расположения элементов 
-		в различных свойствах скроллируемых контейнерах и т.п. виджетах.
-	Значения:
-    	WIDGETS_ARRANGEMENT_T2B - сверху вниз
-    	WIDGETS_ARRANGEMENT_L2R - слева направо
-    	WIDGETS_ARRANGEMENT_B2T - снизу вверх
-    	WIDGETS_ARRANGEMENT_R2L - справа налево 
-	-->
 	
 	<elementsInterval>0</elementsInterval>
 	

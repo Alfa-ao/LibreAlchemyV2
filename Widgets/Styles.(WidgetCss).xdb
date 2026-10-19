@@ -11,25 +11,7 @@
                 </Item>
             </Items>
         </Item>
-        <!-- <Item>
-            <Name>alchemy-default-style</Name>
-            <Items>
-                <Item>
-                    <Key>fontsize</Key>
-                    <Value>15</Value>
-                </Item>
-				<Item>
-					<Key>fontname</Key>
-					<Value>AllodsFantasy</Value>
-				</Item>
-            </Items>
-        </Item> -->
         <Item>
-			<!-- кастомные теги <alchemy>hello</alchemy>
-                Или: 
-                    common.CreateValuedText { ..., class01 = "alchemy" }
-                    <rs class="class01">...</rs> 
-            -->
             <Name>alchemy</Name> 
 			<Items>
 				<Item>

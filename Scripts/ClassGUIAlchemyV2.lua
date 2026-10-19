@@ -1,62 +1,56 @@
 --------------------------------------------------------------------------------
--- ClassGUIAlchemyV2.lua
--- Обертка для кастомизации стандартного интерфейса окна алхимии.
--- Изменяет размеры и позиции стандартных элементов (колб, кнопок, горелок).
+--[[
+ClassGUIAlchemyV2.lua - Обертка для кастомизации стандартного интерфейса окна алхимии.
+    Изменяет размеры и позиции стандартных элементов (колб, кнопок, горелок).
+
+Класс GUIAlchemyV2 реализует следующие методы:
+    self.Init - _wtRolls - Панель с колбами. _wtRecipeName - Виджет, откуда достаётся имя рецепта.
+    self.CustomStyle - Всё что стилизуется в родном интерфейсе AlchemyV2.
+    self.GetCurrentRecipeName - Получить имя рецепта, выбранного в AlchemyV2.
+]]
 --------------------------------------------------------------------------------
 
 Class( "GUIAlchemyV2" )
 
---------------------------------------------------------------------------------
---- Инициализация.
---- @param wtAlchemyV2 Widget | TWidget
---------------------------------------------------------------------------------
-function GUIAlchemyV2:Init( wtAlchemyV2 )
-    self._wtRolls = wtAlchemyV2:
-        GetChildChecked( "MainFrame" ):
-        GetChildChecked( "Alchemy" ):
-        GetChildChecked( "Game" ):
-        GetChildChecked( "View" ):
-        GetChildChecked( "Rolls" )
-
-    self._wtRecipeName = wtAlchemyV2:
-        GetChildChecked( "MainFrame" ):
-        GetChildChecked( "Alchemy" ):
-        GetChildChecked( "Game" ):
-        GetChildChecked( "View" ):
-        GetChildChecked( "Recipe" ):
-        GetChildChecked( "Name" )
+local function ChildPath( widget, path )
+    for part in string.gmatch( path, "[^.]+" ) do
+        widget = widget:GetChildChecked( part )
+    end
+    return widget
 end
 
-
-
 --------------------------------------------------------------------------------
--- Кастомный стиль окна с барабанами в АлхимкиV2
+--- @param wtAlchemyV2 Widget
+--------------------------------------------------------------------------------
+function GUIAlchemyV2:Init( wtAlchemyV2 )
+    self._wtRolls = ChildPath( wtAlchemyV2, "MainFrame.Alchemy.Game.View.Rolls" )
+    self._wtRecipeName = ChildPath( wtAlchemyV2, "MainFrame.Alchemy.Game.View.Recipe.Name" )
+end
+
 --------------------------------------------------------------------------------
 function GUIAlchemyV2:CustomStyle()
     if not CONFIG.ENABLE_CUSTOM_LAYOUT then
         return
     end
     
-    local listBars = {
-        self._wtRolls:GetChildChecked( "Bar01" ),
-        self._wtRolls:GetChildChecked( "Bar02" ),
-        self._wtRolls:GetChildChecked( "Bar03" ),
-        self._wtRolls:GetChildChecked( "Bar04" ),
-        self._wtRolls:GetChildChecked( "Bar05" ),
-    }
+    local listBars = {}
+    for i = 1, 5 do
+        listBars[ i ] = self._wtRolls:GetChildChecked( "Bar0" .. i )
+    end
     
     -- Bar(01/02/03/04/05).RollTube.(ActionUp/ActionDown)
     for _, bar in ipairs( listBars ) do
         local rollTube = bar:GetChildChecked( "RollTube" )
+        local actionUp = rollTube:GetChildChecked( "ActionUp" )
+        local actionDown = rollTube:GetChildChecked( "ActionDown" )
+        local correctionCount = bar:GetChildChecked( "CorrectionCount" )
         
         -- Отвечает за: Позицию верхней кнопки.
-        local actionUp = rollTube:GetChildChecked( "ActionUp" )
         local plcActionUp = actionUp:GetPlacementPlain()
         plcActionUp.posY = CONFIG.GUI.ACTION_UP_POS_Y
         actionUp:SetPlacementPlain( plcActionUp )
         
         -- Отвечает за: Позицию нижней кнопки.
-        local actionDown = rollTube:GetChildChecked( "ActionDown" )
         local plcActionDown = actionDown:GetPlacementPlain()
         plcActionDown.posY = CONFIG.GUI.ACTION_UP_POS_Y + plcActionDown.sizeY
         actionDown:SetPlacementPlain( plcActionDown )
@@ -72,7 +66,6 @@ function GUIAlchemyV2:CustomStyle()
         bar:SetPlacementPlain( plcBar )
         
         -- Отвечает за: Цифра над горелкой
-        local correctionCount = bar:GetChildChecked( "CorrectionCount" )
         local plcCorrectionCount = correctionCount:GetPlacementPlain()
         plcCorrectionCount.sizeY = CONFIG.GUI.CORRECTION_COUNT_EXTRA_SIZE
         correctionCount:SetPlacementPlain( plcCorrectionCount )
@@ -85,10 +78,7 @@ function GUIAlchemyV2:CustomStyle()
     self._wtRolls:SetPlacementPlain( plcRolls )
 end
 
-
-
 --------------------------------------------------------------------------------
---- Получить имя рецепта, выбранного в AlchemyV2 (в меню варки).
 --- @return WString
 --------------------------------------------------------------------------------
 function GUIAlchemyV2:GetCurrentRecipeName()

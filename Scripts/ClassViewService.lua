@@ -1,11 +1,25 @@
 --------------------------------------------------------------------------------
--- ClassViewService.lua
--- Сервис для управления GUI (View слой).
--- Форматирует и выводит сообщения в текстовый контейнер.
+--[[
+ClassViewService.lua - Сервис для управления GUI.
+
+Класс ViewService реализует следующие методы:
+    self.Init
+    self.ScheduleResetMessageType - Планирование сброса типа сообщения к нормальному режиму.
+    self.ShowGreetings        - Вывод приветственного сообщения или "С возвращением!".
+    self.ShowPotentialRecipes - Вывод статуса компонентов и количества возможных рецептов.
+    self.ShowReactionResults  - Вывод результатов реакции в текстовый контейнер.
+    self.ShowCongratulation   - Вывод сообщения поздравления.
+    self.ShowItemTaken        - Вывод сообщения о получении предмета игроком.
+    self.FormatResults        - Форматирование списка найденных рецептов для отображения.
+    self.ResultsForLog        - Форматирование списка найденных рецептов для вывода в лог.
+    self.UpdateCenterPanel    - Центрирование панели с текстовой подсказкой.
+    self.CancelDelayedCalls   - Отмена отложенных вызовов при закрытии окна.
+]]
 --------------------------------------------------------------------------------
 
 Class( "ViewService", {
-    messageType = CONFIG.MESSAGE_GREETINGS -- number Изначальный тип сообщения.
+    messageType = CONFIG.MESSAGE_GREETINGS, -- number Изначальный тип сообщения.
+    _taskRefResetMessageType = nil
 } )
 
 --------------------------------------------------------------------------------
@@ -19,34 +33,25 @@ function ViewService:Init( localization, alchemy, textContainer )
     self._textContainer = textContainer
 end
 
-
-
---------------------------------------------------------------------------------
--- Запланировать автоматический сброс типа сообщения к MESSAGE_NORMAL.
--- Необходимо, чтобы приветствие или поздравление задержалось отображением, а затем тригер возвращался к нормальному режиму.
 --------------------------------------------------------------------------------
 function ViewService:ScheduleResetMessageType()
     if self.messageType == CONFIG.MESSAGE_NORMAL then
         return
     end
     
-    if AlchemyState.taskRefs.funcResetMessageType ~= nil then
-        common.CancelDelayedCall( AlchemyState.taskRefs.funcResetMessageType )
+    if self._taskRefResetMessageType then
+        common.CancelDelayedCall( self._taskRefResetMessageType )
     end
 
-    AlchemyState.taskRefs.funcResetMessageType = common.DelayedCall( CONFIG.DELAY_MS_UPDATE, function()
+    self._taskRefResetMessageType = common.DelayedCall( CONFIG.DELAY_MS_UPDATE, function()
         self.messageType = CONFIG.MESSAGE_NORMAL
-        AlchemyState.taskRefs.funcResetMessageType = nil
+        self._taskRefResetMessageType = nil
         -----------------DEBUG------------------
         DebugService.LogGeneral( "MESSAGE_TYPE change to default: <MESSAGE_NORMAL>" )
         ------------------END-------------------
     end )
 end
 
-
-
---------------------------------------------------------------------------------
---- Показывает GREETINGS / WELCOME_BACK сообщение.
 --------------------------------------------------------------------------------
 function ViewService:ShowGreetings()
     if self.messageType == CONFIG.MESSAGE_WELCOME_BACK then
@@ -55,8 +60,6 @@ function ViewService:ShowGreetings()
         self._textContainer:SetLines( GetAddonText( self._localization, "GREETINGS" ) )
     end
 end
-
-
 
 --------------------------------------------------------------------------------
 --- Показывает статус компонентов и количество возможных рецептов.
@@ -77,8 +80,6 @@ function ViewService:ShowPotentialRecipes( countRecipe, filledSlotsCount )
     end
 end
 
-
-
 --------------------------------------------------------------------------------
 --- Показывает результаты реакции (варки).
 --- @param foundResults table Результаты поиска.
@@ -94,19 +95,12 @@ function ViewService:ShowReactionResults( foundResults, maxDisplay, drumsCount )
     end
 end
 
-
-
---------------------------------------------------------------------------------
---- Показывает поздравление с изменением списка рецептов.
 --------------------------------------------------------------------------------
 function ViewService:ShowCongratulation()
     self._textContainer:SetLines( GetAddonText( self._localization, "CONGRATULATION" ) )
 end
 
-
-
 --------------------------------------------------------------------------------
---- Показывает сообщение о получении предмета (для аватара).
 --- @param potionName string Имя зелья.
 --- @param count number Количество предметов.
 --------------------------------------------------------------------------------
@@ -121,18 +115,13 @@ function ViewService:ShowItemTaken( potionName, count )
     self._textContainer:SetLines( vtItem )
 end
 
-
-
 --------------------------------------------------------------------------------
---- Форматируется список найденных рецептов в общий ValuedText.
---- Результаты сортируются по убыванию уровня умения (score), при равенстве: по имени.
---- @param found table массив найденных результатов (см. AlchemySearchService:FindBestRecipes).
+--- @param found table массив найденных результатов (см. SearchService:FindBestRecipes).
 --- @param maxDisplay number максимальное количество строк для отображения (ТОП-N).
 --- @param drumsCount number количество барабанов (для вывода сдвигов).
 --- @return table linesData { ValuedText, ... }
 --------------------------------------------------------------------------------
 function ViewService:FormatResults( found, maxDisplay, drumsCount )
-	-- Сортировка: сначала по уровню (score) убывания, затем по имени (name) убывания
 	table.sort( found, function( a, b )
 		if a.recipe.score == b.recipe.score then
 			return a.recipe.name > b.recipe.name
@@ -160,7 +149,7 @@ function ViewService:FormatResults( found, maxDisplay, drumsCount )
 			-- Форматируется сдвиг для отображения "% d" = " 1" or "-1". Функция не умеет работать с подобными форматами:
             -- common.FormatInt( -foundResult.shifts[ drumIndex ], "% d" )
             -- Бьётся: "UI::LuaCommonFormatInt: РфQx"
-            textValues[ "bulb" .. drumIndex ] = userMods.ToWString( string.format( "% d", -foundResult.shifts[ drumIndex ] ) )
+            textValues[ "bulb" .. drumIndex ] = ToWs( string.format( "% d", -foundResult.shifts[ drumIndex ] ) )
         end
 		
         table.insert( linesData, common.CreateValuedText( textValues ) )
@@ -169,11 +158,7 @@ function ViewService:FormatResults( found, maxDisplay, drumsCount )
     return linesData
 end
 
-
-
 --------------------------------------------------------------------------------
---- Тоже самое что и FormatResults, но для дебага.
---- Формат записи: EVENT_ALCHEMY_REACTION_FINISHED:123,1,-1,0,0,0,зелье|123,...
 --- @param found table массив найденных результатов (recipe и shifts).
 --- @param maxDisplay number максимальное количество строк для отображения (ТОП-N).
 --- @param drumsCount number количество барабанов (для вывода сдвигов).
@@ -191,18 +176,17 @@ function ViewService:ResultsForLog( found, maxDisplay, drumsCount )
 			logStr = logStr .. string.format( ",%d", -foundResult.shifts[ drumIndex ] )
 		end
 		
-		logStr = logStr .. "," .. userMods.FromWString( foundResult.recipe.name )
+		logStr = logStr .. "," .. FromWs( foundResult.recipe.name )
 		table.insert( parts, logStr )
 	end
 	
 	return "EVENT_ALCHEMY_REACTION_FINISHED:" .. table.concat( parts, "|" )
 end
 
-
-
 --------------------------------------------------------------------------------
---- Центрирует панель с подсказкой.
---------------------------------------------------------------------------------
-function ViewService:UpdateCenterPanel()
-    self._textContainer:UpdateCenterPanel()
+function ViewService:CancelDelayedCalls()
+    if self._taskRefResetMessageType ~= nil then
+        common.CancelDelayedCall( self._taskRefResetMessageType )
+        self._taskRefResetMessageType = nil
+    end
 end
