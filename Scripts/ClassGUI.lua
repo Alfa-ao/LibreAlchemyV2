@@ -1,34 +1,46 @@
 --------------------------------------------------------------------------------
 --[[
-ClassGUIAlchemyV2.lua - Обертка для кастомизации стандартного интерфейса окна алхимии.
-    Изменяет размеры и позиции стандартных элементов (колб, кнопок, горелок).
+ClassGUI.lua - Общий слой для работы с нативным виджетом и кастомизацией.
 
-Класс GUIAlchemyV2 реализует следующие методы:
-    self.Init - _wtRolls - Панель с колбами. _wtRecipeName - Виджет, откуда достаётся имя рецепта.
-    self.CustomStyle - Всё что стилизуется в родном интерфейсе AlchemyV2.
-    self.GetCurrentRecipeName - Получить имя рецепта, выбранного в AlchemyV2.
+Класс GUI реализует следующие методы:
+    self.Init
+    self.CustomStyle          - Применение кастомного стиля к окну алхимии.
+    self.GetCurrentRecipeName - Получение имени текущего рецепта.
+    self.SetLines             - Установка строк в текстовый контейнер.
+    self.UpdateSizePanel      - Обновляет размеры Panel при изменении масштаба/размера окна.
+    self.PosCenterPanel       - Центрирование панели подсказки.
 ]]
 --------------------------------------------------------------------------------
 
-Class( "GUIAlchemyV2" )
+Class( "GUI" )
 
 local function ChildPath( widget, path )
     for part in string.gmatch( path, "[^.]+" ) do
         widget = widget:GetChildChecked( part )
     end
+    
     return widget
 end
 
 --------------------------------------------------------------------------------
---- @param wtAlchemyV2 Widget
+--- @param wtAlchemyV2 Widget | TWidget
+--- @param wtPanel Widget | TWidget
+--- @param wtTextContainer Widget | TWidget
 --------------------------------------------------------------------------------
-function GUIAlchemyV2:Init( wtAlchemyV2 )
+function GUI:Init( wtAlchemyV2, wtPanel, wtTextContainer )
     self._wtRolls = ChildPath( wtAlchemyV2, "MainFrame.Alchemy.Game.View.Rolls" )
     self._wtRecipeName = ChildPath( wtAlchemyV2, "MainFrame.Alchemy.Game.View.Recipe.Name" )
+    
+    self._wtParent = wtPanel
+    self._wtTextContainer = wtTextContainer
+    
+    self:CustomStyle()
+    
+    advEvent.RegisterEventHandler( self, self.UpdateSizePanel, "EVENT_POS_CONVERTER_CHANGED" )
 end
 
 --------------------------------------------------------------------------------
-function GUIAlchemyV2:CustomStyle()
+function GUI:CustomStyle()
     if not CONFIG.ENABLE_CUSTOM_LAYOUT then
         return
     end
@@ -79,8 +91,62 @@ function GUIAlchemyV2:CustomStyle()
 end
 
 --------------------------------------------------------------------------------
---- @return WString
+--- @return WString name Имя зелья
 --------------------------------------------------------------------------------
-function GUIAlchemyV2:GetCurrentRecipeName()
+function GUI:GetCurrentRecipeName()
     return self._wtRecipeName:GetWString()
+end
+
+--------------------------------------------------------------------------------
+--- @param ... ValuedText | WString | string
+--------------------------------------------------------------------------------
+function GUI:SetLines( ... )
+    self._wtTextContainer:RemoveItems()
+	
+	for _, line in ipairs { ... }  do
+		self._wtTextContainer:PushBackText( line )
+	end
+	
+    self:UpdateSizePanel()
+end
+
+--------------------------------------------------------------------------------
+function GUI:UpdateSizePanel()
+    self._wtTextContainer:ForceReposition()
+    
+    local contentPlc = self._wtTextContainer.wt__Border.wt__Content:GetPlacementPlain()
+    local ouTextPlc = self._wtTextContainer:GetPlacementPlain()
+    
+    ouTextPlc.posX = CONFIG.GUI.PADDING
+    ouTextPlc.posY = CONFIG.GUI.PADDING
+    
+    self._wtTextContainer:SetPlacementPlain( ouTextPlc )
+    
+    -- Ширина: отступ слева (posX) и справа + фиксированная ширина текста
+    local targetSizeX = CONFIG.GUI.PADDING * 2 + ouTextPlc.sizeX
+    -- Высота: отступ сверху (posY) и снизу + высота текста
+    local targetSizeY = CONFIG.GUI.PADDING * 2 + contentPlc.posY + contentPlc.sizeY
+
+    -- Новый размер для Panel
+    local panelPlc = self._wtParent:GetPlacementPlain()
+    
+    if panelPlc.alignX == WIDGET_ALIGN_CENTER then
+        -- Позиционирование от центра: окно смещается вниз от центра Y
+        panelPlc.posY = panelPlc.posY - panelPlc.sizeY / 2 + targetSizeY / 2
+    end
+    
+    panelPlc.sizeX = targetSizeX
+    panelPlc.sizeY = targetSizeY
+    
+    self._wtParent:SetPlacementPlain( panelPlc )
+end
+
+--------------------------------------------------------------------------------
+function GUI:PosCenterPanel()
+    local plc = self._wtParent:GetPlacementPlain()
+    
+    plc.posX = CONFIG.GUI.POS_X
+    plc.posY = CONFIG.GUI.SIZE_Y / 2 + plc.sizeY / 2
+    
+    self._wtParent:SetPlacementPlain( plc )
 end

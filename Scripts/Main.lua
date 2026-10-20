@@ -13,21 +13,17 @@ local dndManager = DnDManager()
 dndManager:Init { defaultCursor = CONFIG.DND.CURSOR }
 
 --------------------------------------------------------------------------------
--- Всё что изменяется кастомно внутри окна AlchemyV2
+-- Интерфейс
 --------------------------------------------------------------------------------
-local alchemyV2 = GUIAlchemyV2()
-alchemyV2:Init( common.GetAddonMainForm( "AlchemyV2" ) )
-alchemyV2:CustomStyle()
+local gui = GUI()
+gui:Init(
+    common.GetAddonMainForm( "AlchemyV2" ),
+    mainForm.wtPanel,
+    mainForm.wtPanel.wtTextContainer
+)
 
---------------------------------------------------------------------------------
--- Всё что связано с текстом (почти)
---------------------------------------------------------------------------------
-local textContainer = GUITextContainer()
-textContainer:Init( mainForm.wtPanel, "TextContainer" )
-viewService:Init( common.GetLocalization(), alchemyV2, textContainer )
-
-textContainer:PosCenterPanel()
---dndManager:Register( mainForm.wtPanel, { saveToConfig = CONFIG.DND.SAVE } )
+viewService:Init( common.GetLocalization(), gui )
+dndManager:Register( mainForm.wtPanel, { saveToConfig = CONFIG.DND.SAVE } )
 
 --------------------------------------------------------------------------------
 -- Логика в событиях

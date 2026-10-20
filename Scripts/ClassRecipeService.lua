@@ -63,6 +63,9 @@ function RecipeService:CreateRecipeCache()
     self._recipeCache = {}
     local alchemyInfo = avatar.GetAlchemyInfo()
     
+    self._drumsCount = alchemyInfo.drumsCount
+    self._drumSize = alchemyInfo.drumSize
+    
     for _, recipeId in pairs( alchemyInfo.recipes ) do
         local recipeInfo = avatar.GetRecipeInfo( recipeId )
         if recipeInfo then
@@ -70,7 +73,7 @@ function RecipeService:CreateRecipeCache()
 				componentsCount = 0,      -- Общее количество компонентов, требуемых рецептом.
 				name = recipeInfo.name,   -- Локализованное имя зелья/рецепта.
 				score = recipeInfo.score, -- Необходимый уровень умения для крафта.
-				requiredComponents = {},  -- Хеш-таблица требуемых компонентов: { ["Имя"] = кол-во }.
+				requiredComponents = {},  -- Хеш-таблица требуемых компонентов: { ["Имя(userdata)"] = кол-во }.
             }
             
             for _, componentProperty in pairs( recipeInfo.components ) do
@@ -78,7 +81,7 @@ function RecipeService:CreateRecipeCache()
                 recipe.componentsCount = recipe.componentsCount + 1
             end
             
-            table.insert( self._recipeCache, recipe )
+            self._recipeCache[ #self._recipeCache + 1 ] = recipe
         end
     end
 end
@@ -117,7 +120,7 @@ function RecipeService:FilterByComponents( availableComponents, filledDrumsCount
 	
     for _, recipe in pairs( self._recipeCache ) do
         if self:IsRecipeMatch( recipe, availableComponents, filledDrumsCount ) then
-            table.insert( filteredRecipes, recipe )
+            filteredRecipes[ #filteredRecipes + 1 ] = recipe
             count = count + 1
         end
     end
@@ -131,11 +134,10 @@ end
 --------------------------------------------------------------------------------
 function RecipeService:CountPotential()
     self:CreateRecipeCache()
-    local alchemyInfo = avatar.GetAlchemyInfo()
     
-    local availableComponents, filledDrumsCount = collectDrumComponents( false, 0, alchemyInfo.drumsCount, alchemyInfo.drumSize )
-    
+    local availableComponents, filledDrumsCount = collectDrumComponents( false, 0, self._drumsCount, self._drumSize )
     local potentialCount = 0
+    
     for _, recipe in ipairs( self._recipeCache ) do
         if self:IsRecipeMatch( recipe, availableComponents, filledDrumsCount ) then
             potentialCount = potentialCount + 1
@@ -151,10 +153,8 @@ end
 --- @return number totalDrumsCount Общее количество заполненных барабанов.
 --------------------------------------------------------------------------------
 function RecipeService:BuildDrumShiftMap( maxCorrections )
-    local alchemyInfo = avatar.GetAlchemyInfo()
-    
     local availableComponents, totalDrumsCount, drumShiftMap = collectDrumComponents( 
-        true, maxCorrections, alchemyInfo.drumsCount, alchemyInfo.drumSize
+        true, maxCorrections, self._drumsCount, self._drumSize
     )
     
     return drumShiftMap, availableComponents, totalDrumsCount

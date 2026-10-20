@@ -12,17 +12,16 @@
     "require": {
         "api": "17.0.01.70",
         "useCommonScripts": true,
-        "Alfa-ao/DnDManager": "v1.2.1",
         "Alfa-ao/Enum": "v1.1.0",
-        "Alfa-ao/DebugService": "v1.0.0"
+        "Alfa-ao/DebugService": "v1.0.0",
+        "Alfa-ao/DnDManager": "v1.3.0"
     },
     "files": {
         "Scripts/Config.lua": 50,
         "Scripts/ClassRecipeService.lua": 10,
         "Scripts/ClassSearchService.lua": 10,
         "Scripts/ClassViewService.lua": 10,
-        "Scripts/ClassGUIAlchemyV2.lua": 10,
-        "Scripts/ClassGUITextContainer.lua": 10,
+        "Scripts/ClassGUI.lua": 10,
         "Scripts/ClassEventHandlers.lua": 10,
         "Scripts/Main.lua": 0
     }

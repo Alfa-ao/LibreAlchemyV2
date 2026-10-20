@@ -24,13 +24,13 @@ Class( "ViewService", {
 
 --------------------------------------------------------------------------------
 --- @param localization string Локализация "eng", "rus".
---- @param alchemy table ClassGUIAlchemyV2
---- @param textContainer table ClassGUITextContainer
+--- @param gui table ClassGUI
 --------------------------------------------------------------------------------
-function ViewService:Init( localization, alchemy, textContainer )
+function ViewService:Init( localization, gui )
     self._localization = localization
-    self._alchemy = alchemy
-    self._textContainer = textContainer
+    self._gui = gui
+    
+    gui:PosCenterPanel()
 end
 
 --------------------------------------------------------------------------------
@@ -39,25 +39,22 @@ function ViewService:ScheduleResetMessageType()
         return
     end
     
-    if self._taskRefResetMessageType then
-        common.CancelDelayedCall( self._taskRefResetMessageType )
-    end
+    self:CancelDelayedCalls()
 
     self._taskRefResetMessageType = common.DelayedCall( CONFIG.DELAY_MS_UPDATE, function()
         self.messageType = CONFIG.MESSAGE_NORMAL
         self._taskRefResetMessageType = nil
-        -----------------DEBUG------------------
+        
         DebugService.LogGeneral( "MESSAGE_TYPE change to default: <MESSAGE_NORMAL>" )
-        ------------------END-------------------
     end )
 end
 
 --------------------------------------------------------------------------------
 function ViewService:ShowGreetings()
     if self.messageType == CONFIG.MESSAGE_WELCOME_BACK then
-        self._textContainer:SetLines( GetAddonText( self._localization, "WELCOME_BACK" ) )
+        self._gui:SetLines( GetAddonText( self._localization, "WELCOME_BACK" ) )
     elseif self.messageType == CONFIG.MESSAGE_GREETINGS then
-        self._textContainer:SetLines( GetAddonText( self._localization, "GREETINGS" ) )
+        self._gui:SetLines( GetAddonText( self._localization, "GREETINGS" ) )
     end
 end
 
@@ -72,11 +69,11 @@ function ViewService:ShowPotentialRecipes( countRecipe, filledSlotsCount )
             format = GetAddonText( self._localization, "COUNT_RECIPES" ),
             count  = countRecipe,
         }
-        self._textContainer:SetLines( vtCountRecipes )
+        self._gui:SetLines( vtCountRecipes )
     elseif filledSlotsCount > 0 then
-        self._textContainer:SetLines( GetAddonText( self._localization, "COMPONENTS_NOT_READY" ) )
+        self._gui:SetLines( GetAddonText( self._localization, "COMPONENTS_NOT_READY" ) )
     else
-        self._textContainer:SetLines( GetAddonText( self._localization, "NOT_FOUND_RECIPES" ) )
+        self._gui:SetLines( GetAddonText( self._localization, "NOT_FOUND_RECIPES" ) )
     end
 end
 
@@ -88,16 +85,16 @@ end
 --------------------------------------------------------------------------------
 function ViewService:ShowReactionResults( foundResults, maxDisplay, drumsCount )
     if #foundResults == 0 then
-        self._textContainer:SetLines( GetAddonText( self._localization, "RESULT_GIBBERISH" ) )
+        self._gui:SetLines( GetAddonText( self._localization, "RESULT_GIBBERISH" ) )
     else
         local linesData = self:FormatResults( foundResults, maxDisplay, drumsCount )
-        self._textContainer:SetLines( table.unpack( linesData ) )
+        self._gui:SetLines( table.unpack( linesData ) )
     end
 end
 
 --------------------------------------------------------------------------------
 function ViewService:ShowCongratulation()
-    self._textContainer:SetLines( GetAddonText( self._localization, "CONGRATULATION" ) )
+    self._gui:SetLines( GetAddonText( self._localization, "CONGRATULATION" ) )
 end
 
 --------------------------------------------------------------------------------
@@ -112,7 +109,7 @@ function ViewService:ShowItemTaken( potionName, count )
         class1 = "alchemy-yellow-text",
     }
     
-    self._textContainer:SetLines( vtItem )
+    self._gui:SetLines( vtItem )
 end
 
 --------------------------------------------------------------------------------
@@ -130,7 +127,7 @@ function ViewService:FormatResults( found, maxDisplay, drumsCount )
 	end )
 	
     -- Имя текущего зелья
-    local currentRecipeName = self._alchemy:GetCurrentRecipeName()
+    local currentRecipeName = self._gui:GetCurrentRecipeName()
 	-- Шаблон строки рецепта "level: N |N |N |N |N - name"
     local recipeLineFormat = GetAddonText( "template", "RECIPE_LINE" )
 	-- Создание строк для ТОП-N рецептов
@@ -152,7 +149,7 @@ function ViewService:FormatResults( found, maxDisplay, drumsCount )
             textValues[ "bulb" .. drumIndex ] = ToWs( string.format( "% d", -foundResult.shifts[ drumIndex ] ) )
         end
 		
-        table.insert( linesData, common.CreateValuedText( textValues ) )
+        linesData[ #linesData + 1 ] = common.CreateValuedText( textValues )
     end
     
     return linesData
@@ -177,7 +174,7 @@ function ViewService:ResultsForLog( found, maxDisplay, drumsCount )
 		end
 		
 		logStr = logStr .. "," .. FromWs( foundResult.recipe.name )
-		table.insert( parts, logStr )
+		parts[ #parts + 1 ] = logStr
 	end
 	
 	return "EVENT_ALCHEMY_REACTION_FINISHED:" .. table.concat( parts, "|" )
@@ -185,7 +182,7 @@ end
 
 --------------------------------------------------------------------------------
 function ViewService:CancelDelayedCalls()
-    if self._taskRefResetMessageType ~= nil then
+    if self._taskRefResetMessageType then
         common.CancelDelayedCall( self._taskRefResetMessageType )
         self._taskRefResetMessageType = nil
     end

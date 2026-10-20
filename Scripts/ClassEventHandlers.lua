@@ -31,18 +31,12 @@ end
 
 --------------------------------------------------------------------------------
 function EventHandlers:OnStarted()
-    mainForm:Show( true )
-
-    -- Создается кэш всех доступных рецептов.
-    self._services.recipe:CreateRecipeCache()
-
-    -- Выводит HELLO сообщение в зависимости от предыдущего состояния
-    self._services.view:ShowGreetings()
-    -----------------DEBUG------------------
     DebugService.LogGeneral( "EVENT_ALCHEMY_STARTED", { "ShowGreetings:", self._services.view.messageType } )
-    ------------------END-------------------
     
-    -- Запланировать возврат к режиму MESSAGE_NORMAL
+    mainForm:Show( true )
+    
+    self._services.recipe:CreateRecipeCache()
+    self._services.view:ShowGreetings()
     self._services.view:ScheduleResetMessageType()
 end
 
@@ -53,7 +47,7 @@ function EventHandlers:OnCanceled( params )
     -- Fix: 17.0.01.37 isSuccess (number(0/1))
     if not params.isSuccess or params.isSuccess == 0 then
         mainForm:Show( false )
-        self._reactionSuccess = false -- Сброс флага успешной реакции
+        self._reactionSuccess = false
         
         self:CancelDelayedCalls()
         self._services.view:CancelDelayedCalls()
@@ -62,12 +56,10 @@ function EventHandlers:OnCanceled( params )
         self._services.view.messageType = CONFIG.MESSAGE_WELCOME_BACK
     end
     
-    -----------------DEBUG------------------
     DebugService.LogGeneral(
         "EVENT_ALCHEMY_CANCELED",
         { "params: { isSuccess: boolean }", params }
     )
-    ------------------END-------------------
 end
 
 --------------------------------------------------------------------------------
@@ -78,7 +70,6 @@ function EventHandlers:OnItemPlaced( params )
         self._reactionSuccess = false
     end
     
-    -----------------DEBUG------------------
     DebugService.LogGeneral( 
         "EVENT_ALCHEMY_ITEM_PLACED",
         function ()
@@ -87,53 +78,38 @@ function EventHandlers:OnItemPlaced( params )
         end, 
         { "params: { placed: boolean, slot: number }", params }
     )
-    ------------------END-------------------
     
-    -- Блокировка для дальнейшего этапа показа сообщения. Переключится через {CONFIG.DELAY_MS_UPDATE}.
-    if self._services.view.messageType ~= CONFIG.MESSAGE_NORMAL then
+    -- Блокировка ShowPotentialRecipes сообщения.
+    if self._services.view.messageType ~= CONFIG.MESSAGE_NORMAL or self._reactionSuccess then
         return
     end
     
-    local function funcGetMessage()
+    self:CancelDelayedCalls()
+    
+    local function ShowPotentialRecipes()
         self._taskRefItemPlaced = nil
         
-        if not self._reactionSuccess then
-            -- Кол-во возможных рецептов (countRecipe) и кол-во требуемых слотов (filledDrumsCount)
-            local countRecipe, filledDrumsCount = self._services.recipe:CountPotential()
-            self._services.view:ShowPotentialRecipes( countRecipe, filledDrumsCount )
-            
-            -----------------DEBUG------------------
-            DebugService.LogGeneral( { "ShowPotentialRecipes:", countRecipe } )
-            ------------------END-------------------
-        end
-    end
-    
-    -- Отмена предыдущего таймера
-    if self._taskRefItemPlaced then
-        common.CancelDelayedCall( self._taskRefItemPlaced )
+        local countRecipe, filledDrumsCount = self._services.recipe:CountPotential()
+        self._services.view:ShowPotentialRecipes( countRecipe, filledDrumsCount )
+        
+        DebugService.LogGeneral( { "ShowPotentialRecipes:", countRecipe } )
     end
 	
-    self._taskRefItemPlaced = common.DelayedCall( CONFIG.DELAY_MS_UPDATE, funcGetMessage )
+    self._taskRefItemPlaced = common.DelayedCall( CONFIG.DELAY_MS_UPDATE, ShowPotentialRecipes )
 end
 
 --------------------------------------------------------------------------------
 function EventHandlers:OnReactionFinished()
-    local found = self._services.search:FindBestRecipes() -- (HELP) постоянно пустая таблица {}
-    local drumsCount = avatar.GetAlchemyInfo().drumsCount
-    
+    local found, drumsCount = self._services.search:FindBestRecipes()
     self._services.view:ShowReactionResults( found, CONFIG.MAX_DISPLAY_RESULTS, drumsCount )
     
     if #found == 0 then
         -- Бормотуха
-		-----------------DEBUG------------------
         DebugService.LogReaction( "EVENT_ALCHEMY_REACTION_FINISHED:{empty}" )
-        ------------------END-------------------
     else
-		-----------------DEBUG------------------
         DebugService.LogReaction( function()
             return self._services.view:ResultsForLog( found, CONFIG.MAX_DISPLAY_RESULTS, drumsCount )
         end )
-        ------------------END-------------------
     end
     
     self._reactionSuccess = true
@@ -141,19 +117,13 @@ end
 
 --------------------------------------------------------------------------------
 function EventHandlers:OnRecipesChanged()
-    -----------------DEBUG------------------
     DebugService.LogGeneral( "EVENT_ALCHEMY_RECIPES_CHANGED" )
-    ------------------END-------------------
     
     self._services.recipe:ResetRecipeCache()
 	if not mainForm:IsVisible() then return end
     self._services.view:ShowCongratulation()
     
-    -- Отрубить сообщения в EVENT_ALCHEMY_ITEM_PLACED
-    -- поздравление (работаем дальше с алхимкой) или Приветсвие (переоткрыли окно)
     self._services.view.messageType = CONFIG.MESSAGE_WELCOME_BACK
-    
-    -- Запланировать возврат к MESSAGE_NORMAL режиму
     self._services.view:ScheduleResetMessageType()
 end
 
@@ -161,15 +131,13 @@ end
 --- @param params table { actionType: string, itemObject: ValuedObjectLua }
 --------------------------------------------------------------------------------
 function EventHandlers:OnItemTaken( params )
-    if not ( EnumTakeItemActionType.CRAFT:Equals( params.actionType ) and mainForm:IsVisible() ) then
+    if not ( mainForm:IsVisible() and EnumTakeItemActionType.CRAFT:Equals( params.actionType ) ) then
         return
     end
     
-    -----------------DEBUG------------------
     DebugService.LogGeneral( "EVENT_AVATAR_ITEM_TAKEN", { 
         "params: { actionType: string, itemObject: ValuedObjectLua }", params 
     } )
-    ------------------END-------------------
     
     -- Информация о созданном предмете по его ID.
     local info = itemLib.GetItemInfo( params.itemObject:GetId() )
@@ -182,7 +150,7 @@ end
 
 --------------------------------------------------------------------------------
 function EventHandlers:CancelDelayedCalls()
-    if self._taskRefItemPlaced ~= nil then
+    if self._taskRefItemPlaced then
         common.CancelDelayedCall( self._taskRefItemPlaced )
         self._taskRefItemPlaced = nil
     end

@@ -14,15 +14,14 @@
     </userAddonInfo>
     <ScriptFileRefs>
         <Item href="Scripts/Config.lua" />
-        <Item href="Packages/Alfa-ao/DnDManager/src/DnDManager.lua" />
         <Item href="Packages/Alfa-ao/Enum/src/EnumFactory.lua" />
         <Item href="Packages/Alfa-ao/Debug/DebugService.lua" />
+        <Item href="Packages/Alfa-ao/DnDManager/src/DnDManager.lua" />
         <Item href="Packages/Alfa-ao/Enum/src/Definitions/TakeItemActionType.lua" />
         <Item href="Scripts/ClassRecipeService.lua" />
         <Item href="Scripts/ClassSearchService.lua" />
         <Item href="Scripts/ClassViewService.lua" />
-        <Item href="Scripts/ClassGUIAlchemyV2.lua" />
-        <Item href="Scripts/ClassGUITextContainer.lua" />
+        <Item href="Scripts/ClassGUI.lua" />
         <Item href="Scripts/ClassEventHandlers.lua" />
         <Item href="Scripts/Main.lua" />
     </ScriptFileRefs>
