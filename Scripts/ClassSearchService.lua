@@ -47,40 +47,6 @@ function SearchService:Init( recipeService )
 end
 
 --------------------------------------------------------------------------------
---- @return table drumRequiredComponents таблица уникальных компонентов по барабанам
---- @return number totalDrumsCount общее кол-во заполненных барабанов
---------------------------------------------------------------------------------
-function SearchService:BuildDrumShiftMap()
-    local drumRequiredComponents = {}
-    AlchemyState.drumShiftMap = {}
-    local totalDrumsCount = 0
-
-    for drumIndex = 1, AlchemyState.drumsCount do
-        AlchemyState.drumShiftMap[ drumIndex ] = {}
-        local drumInfo = avatar.GetAlchemyDrumInfo( drumIndex - 1 )
-        
-        if drumInfo and drumInfo.itemId ~= nil then
-            totalDrumsCount = totalDrumsCount + 1
-            local uniqueDrumComponents = {}
-            local basePos = drumInfo.position or 0
-            
-            for shift = -AlchemyState.maxCorrections, AlchemyState.maxCorrections do
-                local targetIndex = ( basePos + shift ) % AlchemyState.drumSize
-                local componentProperty = drumInfo.components[ targetIndex ]
-                AlchemyState.drumShiftMap[ drumIndex ][ shift ] = componentProperty
-                uniqueDrumComponents[ componentProperty ] = true
-            end
-            
-            for componentProperty, _ in pairs( uniqueDrumComponents ) do
-                drumRequiredComponents[ componentProperty ] = ( drumRequiredComponents[ componentProperty ] or 0 ) + 1
-            end
-        end
-    end
-    
-    return drumRequiredComponents, totalDrumsCount
-end
-
---------------------------------------------------------------------------------
 --- @param componentMap table хеш-таблица компонентов { ["Имя(userdata)"] = кол-во }.
 --- @param filteredRecipes table | nil массив структур рецептов для проверки.
 --- @return table | nil bestRecipe структура лучшего подходящего рецепта { score: number, requiredComponents: table, name: string }
@@ -112,8 +78,8 @@ end
 function SearchService:FindBestRecipes()
     local alchemyInfo = avatar.GetAlchemyInfo()
     
-    self._drumsCount = alchemyInfo.drumsCount or 0 -- (HELP) 5
-    self._maxCorrections = avatar.GetAlchemyDrumInfo( 0 ).maxCorrectionsPerColumn or 0 -- (HELP) 5
+    self._drumsCount = alchemyInfo.drumsCount or 0
+    self._maxCorrections = avatar.GetAlchemyDrumInfo( 0 ).maxCorrectionsPerColumn or 0
     
     local drumShiftMap, drumRequiredComponents, totalDrumsCount = self._recipe:BuildDrumShiftMap( self._maxCorrections )
     self._drumShiftMap = drumShiftMap
