@@ -23,7 +23,7 @@ local function ChildPath( widget, path )
 end
 
 --------------------------------------------------------------------------------
---- @param wtAlchemyV2 Widget | TWidget
+--- @param wtAlchemyV2 Widget
 --- @param wtPanel Widget | TWidget
 --- @param wtTextContainer Widget | TWidget
 --------------------------------------------------------------------------------
