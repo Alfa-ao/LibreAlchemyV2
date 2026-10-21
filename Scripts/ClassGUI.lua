@@ -35,8 +35,6 @@ function GUI:Init( wtAlchemyV2, wtPanel, wtTextContainer )
     self._wtTextContainer = wtTextContainer
     
     self:CustomStyle()
-    
-    advEvent.RegisterEventHandler( self, self.UpdateSizePanel, "EVENT_POS_CONVERTER_CHANGED" )
 end
 
 --------------------------------------------------------------------------------

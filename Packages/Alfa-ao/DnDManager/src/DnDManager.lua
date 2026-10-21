@@ -380,7 +380,7 @@ function DnDManager:_IsWidget( widget )
     
     -- Проверяется наличие полей и то, что widget является нативным виджетом
     if _id and _widget and common.IsWidget( _widget ) then
-        return GetTWidgetById( id ) == val
+        return GetTWidgetById( _id ) == widget
     end
 
     return false

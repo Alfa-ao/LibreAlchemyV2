@@ -10,12 +10,17 @@
         <version>2.5.0</version>
         <apiVersion>18000000</apiVersion>
         <buildTime>0</buildTime>
-        <useCommonScripts>true</useCommonScripts>
+        <useCommonScripts>false</useCommonScripts>
     </userAddonInfo>
     <ScriptFileRefs>
+        <Item href="/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua" />
+        <Item href="/Mods/SampleCommon/CoreScripts/AddonBaseUserMods.lua" />
+        <Item href="/Mods/SampleCommon/CoreScripts/AddonBase.lua" />
+        <Item href="/Mods/SampleCommon/CoreScripts/WidgetCoreUserMods.lua" />
+        <Item href="/Mods/SampleCommon/CoreScripts/AdvancedHandlersUserMods.lua" />
         <Item href="Scripts/Config.lua" />
-        <Item href="Packages/Alfa-ao/Enum/src/EnumFactory.lua" />
         <Item href="Packages/Alfa-ao/Debug/DebugService.lua" />
+        <Item href="Packages/Alfa-ao/Enum/src/EnumFactory.lua" />
         <Item href="Packages/Alfa-ao/DnDManager/src/DnDManager.lua" />
         <Item href="Packages/Alfa-ao/Enum/src/Definitions/TakeItemActionType.lua" />
         <Item href="Scripts/ClassRecipeService.lua" />

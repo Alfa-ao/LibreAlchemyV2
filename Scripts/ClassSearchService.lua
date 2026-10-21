@@ -13,7 +13,7 @@ ClassSearchService.lua - Сервис для поиска рецептов ал�
 
 Class( "SearchService", {
     _foundSet = {},
-    _drumsCount = 0,
+    _drumsCount = 1,
     _maxCorrections = 0,
     _drumShiftMap = nil,
     _filteredRecipes = nil,
@@ -79,7 +79,7 @@ end
 function SearchService:FindBestRecipes()
     local alchemyInfo = avatar.GetAlchemyInfo()
     
-    self._drumsCount = alchemyInfo.drumsCount or 0
+    self._drumsCount = alchemyInfo.drumsCount or self._drumsCount
     local firstDrumInfo = avatar.GetAlchemyDrumInfo( 0 )
     self._maxCorrections = firstDrumInfo and firstDrumInfo.maxCorrectionsPerColumn or 0
     
