@@ -23,7 +23,77 @@ gui:Init(
 )
 
 viewService:Init( common.GetLocalization(), gui )
-dndManager:Register( mainForm.wtPanel, { saveToConfig = CONFIG.DND.SAVE } )
+
+mainForm.wtPanel.wtDragBottomLeft:Rotate( 4.7124 )
+mainForm.wtPanel.wtDragTopRight:Rotate( 1.5708 )
+mainForm.wtPanel.wtDragTopLeft:Rotate( 3.1416 )
+dndManager:Register( mainForm.wtPanel, { saveToConfig = CONFIG.DND.SAVE },
+{
+    {
+        wtHandle = mainForm.wtPanel.wtDragTopLeft,
+        allowX = true,
+        allowY = true,
+        limitsX = { min = ( CONFIG.GUI.CONTAINER_SIZE_X + CONFIG.GUI.PADDING * 2 ), max = 1000 },
+        limitsY = nil,
+        callback = { gui, gui.UpdateSizePanel }
+    },
+    {
+        wtHandle = mainForm.wtPanel.wtDragTopCenter,
+        allowX = true,
+        allowY = true,
+        limitsX = { min = ( CONFIG.GUI.CONTAINER_SIZE_X + CONFIG.GUI.PADDING * 2 ), max = 1000 },
+        limitsY = nil,
+        callback = { gui, gui.UpdateSizePanel }
+    },
+    {
+        wtHandle = mainForm.wtPanel.wtDragTopRight,
+        allowX = true,
+        allowY = true,
+        limitsX = { min = ( CONFIG.GUI.CONTAINER_SIZE_X + CONFIG.GUI.PADDING * 2 ), max = 1000 },
+        limitsY = nil,
+        callback = { gui, gui.UpdateSizePanel }
+    },
+    {
+        wtHandle = mainForm.wtPanel.wtDragCenterLeft,
+        allowX = true,
+        allowY = true,
+        limitsX = { min = ( CONFIG.GUI.CONTAINER_SIZE_X + CONFIG.GUI.PADDING * 2 ), max = 1000 },
+        limitsY = nil,
+        callback = { gui, gui.UpdateSizePanel }
+    },
+    {
+        wtHandle = mainForm.wtPanel.wtDragCenterRight,
+        allowX = true,
+        allowY = true,
+        limitsX = { min = ( CONFIG.GUI.CONTAINER_SIZE_X + CONFIG.GUI.PADDING * 2 ), max = 1000 },
+        limitsY = nil,
+        callback = { gui, gui.UpdateSizePanel }
+    },
+    {
+        wtHandle = mainForm.wtPanel.wtDragBottomLeft,
+        allowX = true,
+        allowY = true,
+        limitsX = { min = ( CONFIG.GUI.CONTAINER_SIZE_X + CONFIG.GUI.PADDING * 2 ), max = 1000 },
+        limitsY = nil,
+        callback = { gui, gui.UpdateSizePanel }
+    },
+    {
+        wtHandle = mainForm.wtPanel.wtDragBottomCenter,
+        allowX = true,
+        allowY = true,
+        limitsX = { min = ( CONFIG.GUI.CONTAINER_SIZE_X + CONFIG.GUI.PADDING * 2 ), max = 1000 },
+        limitsY = nil,
+        callback = { gui, gui.UpdateSizePanel }
+    },
+    {
+        wtHandle = mainForm.wtPanel.wtDragBottomRight,
+        allowX = true,
+        allowY = true,
+        limitsX = { min = ( CONFIG.GUI.CONTAINER_SIZE_X + CONFIG.GUI.PADDING * 2 ), max = 1000 },
+        limitsY = nil,
+        callback = { gui, gui.UpdateSizePanel }
+    },
+} )
 
 --------------------------------------------------------------------------------
 -- Логика в событиях

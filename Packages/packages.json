@@ -1,5 +1,5 @@
 {
-    "version": "v1",
+    "version": "v2",
     "packages": [
         {
             "name": "Debug",
@@ -15,7 +15,8 @@
                 "/Mods/SampleCommon/CoreScripts/AddonBase.lua": 100
             },
             "tag": "Alfa-ao/DebugService",
-            "version": "v1.0.0"
+            "version": "v1.0.0",
+            "sha": "dd5b19674cf2f4c6c7ea0d8383a96fd8b175c899"
         },
         {
             "name": "Enum",
@@ -32,7 +33,8 @@
                 "src/Definitions/TakeItemActionType.lua": 19
             },
             "tag": "Alfa-ao/Enum",
-            "version": "v1.1.0"
+            "version": "v1.1.0",
+            "sha": "97afdd628638eac0657bad6f4ac0ad3705292aed"
         },
         {
             "name": "DnDManager",
@@ -50,7 +52,8 @@
                 "src/DnDManager.lua": 20
             },
             "tag": "Alfa-ao/DnDManager",
-            "version": "v1.3.0"
+            "version": "v1.4.0",
+            "sha": "3ed880b0667b7e9b0e5434aa4322ca927df3ad6a"
         }
     ]
 }

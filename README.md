@@ -14,13 +14,13 @@
 
 ## Установка
 
-Скачать последний релиз: **[Download Latest Release](https://github.com/Alfa-ao/LibreAlchemyV2/releases/latest)**
+Скачать последний релиз: **[Download](https://github.com/Alfa-ao/LibreAlchemyV2/releases/latest)**
 
 ## Конфигурация
 
 Аддон использует кастомное расположение кнопок барабанов для удобства. Для возврата к стандартному интерфейсу игры:
 
-1. Открыть файл `LibreAlchemyV2\Scripts\Core\Config.lua`.
+1. Открыть файл `LibreAlchemyV2\Scripts\Config.lua`.
 2. Изменить параметр `ENABLE_CUSTOM_LAYOUT = true` на `ENABLE_CUSTOM_LAYOUT = false`.
 3. Перезапустить **игру**.
 

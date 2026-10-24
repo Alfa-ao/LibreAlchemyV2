@@ -110,32 +110,35 @@ end
 
 --------------------------------------------------------------------------------
 function GUI:UpdateSizePanel()
-    self._wtTextContainer:ForceReposition()
-    
-    local contentPlc = self._wtTextContainer.wt__Border.wt__Content:GetPlacementPlain()
+    local panelPlc = self._wtParent:GetPlacementPlain()
     local ouTextPlc = self._wtTextContainer:GetPlacementPlain()
     
     ouTextPlc.posX = CONFIG.GUI.PADDING
     ouTextPlc.posY = CONFIG.GUI.PADDING
     
+    if panelPlc.sizeX > ( CONFIG.GUI.CONTAINER_SIZE_X + CONFIG.GUI.PADDING * 2 ) then
+        ouTextPlc.sizeX = panelPlc.sizeX - CONFIG.GUI.PADDING * 2
+    else
+        ouTextPlc.sizeX = CONFIG.GUI.CONTAINER_SIZE_X
+    end
+    
     self._wtTextContainer:SetPlacementPlain( ouTextPlc )
+    self._wtTextContainer:ForceReposition()
+    
+    local contentPlc = self._wtTextContainer.wt__Border.wt__Content:GetPlacementPlain()
     
     -- Ширина: отступ слева (posX) и справа + фиксированная ширина текста
     local targetSizeX = CONFIG.GUI.PADDING * 2 + ouTextPlc.sizeX
     -- Высота: отступ сверху (posY) и снизу + высота текста
     local targetSizeY = CONFIG.GUI.PADDING * 2 + contentPlc.posY + contentPlc.sizeY
-
-    -- Новый размер для Panel
-    local panelPlc = self._wtParent:GetPlacementPlain()
     
-    if panelPlc.alignX == WIDGET_ALIGN_CENTER then
+    if panelPlc.alignY == WIDGET_ALIGN_CENTER then
         -- Позиционирование от центра: окно смещается вниз от центра Y
         panelPlc.posY = panelPlc.posY - panelPlc.sizeY / 2 + targetSizeY / 2
     end
     
     panelPlc.sizeX = targetSizeX
     panelPlc.sizeY = targetSizeY
-    
     self._wtParent:SetPlacementPlain( panelPlc )
 end
 

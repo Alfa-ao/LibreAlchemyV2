@@ -6,11 +6,11 @@
 	<flatPlacement>false</flatPlacement>
 	<textureItem href="Background.(UISingleTexture).xdb" />
 	<Layout>
-		<LeftX>26</LeftX>
-		<MiddleX>32</MiddleX>
-		<RightX>26</RightX>
-		<TopY>26</TopY>
-		<MiddleY>32</MiddleY>
-		<BottomY>26</BottomY>
+		<LeftX>10</LeftX>
+		<MiddleX>64</MiddleX>
+		<RightX>10</RightX>
+		<TopY>10</TopY>
+		<MiddleY>64</MiddleY>
+		<BottomY>10</BottomY>
 	</Layout>
 </WidgetLayerTiledTexture>

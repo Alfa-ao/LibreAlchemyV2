@@ -2,7 +2,7 @@
 <WidgetTextContainer>
 	<Name>TextContainer</Name>
 	<Priority>0</Priority>
-	<formatFileRef href="ContainerFormat.txt" />
+	<formatFileRef href="../Locales/ContainerFormat.txt" />
 	<defaultTag>text</defaultTag>
 	<Placement>
 		<X>

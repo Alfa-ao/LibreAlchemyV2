@@ -10,17 +10,18 @@
         }
     ],
     "require": {
-        "api": "17.0.01.70",
+        "api": "17.0.01.74",
         "useCommonScripts": false,
         "Alfa-ao/DebugService": "v1.0.0",
         "Alfa-ao/Enum": "v1.1.0",
-        "Alfa-ao/DnDManager": "v1.3.0"
+        "Alfa-ao/DnDManager": "v1.4.0"
     },
     "files": {
         "/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua": 100,
         "/Mods/SampleCommon/CoreScripts/AddonBaseUserMods.lua": 99.99,
-        "/Mods/SampleCommon/CoreScripts/AdvancedHandlersUserMods.lua": 99.96,
+        "/Mods/SampleCommon/CoreScripts/AddonBase.lua": 99.98,
         "/Mods/SampleCommon/CoreScripts/WidgetCoreUserMods.lua": 99.97,
+        "/Mods/SampleCommon/CoreScripts/AdvancedHandlersUserMods.lua": 99.96,
         "Scripts/Config.lua": 50,
         "Scripts/ClassRecipeService.lua": 10,
         "Scripts/ClassSearchService.lua": 10,
