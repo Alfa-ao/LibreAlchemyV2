@@ -8,7 +8,7 @@ ClassGUI.lua - Общий слой для работы с нативным ви�
     self.GetCurrentRecipeName - Получение имени текущего рецепта.
     self.SetLines             - Установка строк в текстовый контейнер.
     self.UpdateSizePanel      - Обновляет размеры Panel при изменении масштаба/размера окна.
-    self.PosCenterPanel       - Центрирование панели подсказки.
+    self.PosCenterPanel       - Начальное центрирование панели подсказки.
 ]]
 --------------------------------------------------------------------------------
 
@@ -33,6 +33,13 @@ function GUI:Init( wtAlchemyV2, wtPanel, wtTextContainer )
     
     self._wtParent = wtPanel
     self._wtTextContainer = wtTextContainer
+    
+    local p = wtPanel.wtPadding:GetPlacementPlain()
+    p.posX = CONFIG.GUI.PADDING
+    p.posY = CONFIG.GUI.PADDING
+    p.highPosX = CONFIG.GUI.PADDING
+    p.highPosY = CONFIG.GUI.PADDING
+    wtPanel.wtPadding:SetPlacementPlain( p )
     
     self:CustomStyle()
 end
@@ -105,39 +112,29 @@ function GUI:SetLines( ... )
 		self._wtTextContainer:PushBackText( line )
 	end
 	
+    self._wtTextContainer:ForceReposition()
     self:UpdateSizePanel()
 end
 
 --------------------------------------------------------------------------------
 function GUI:UpdateSizePanel()
     local panelPlc = self._wtParent:GetPlacementPlain()
-    local ouTextPlc = self._wtTextContainer:GetPlacementPlain()
     
-    ouTextPlc.posX = CONFIG.GUI.PADDING
-    ouTextPlc.posY = CONFIG.GUI.PADDING
-    
-    if panelPlc.sizeX > ( CONFIG.GUI.CONTAINER_SIZE_X + CONFIG.GUI.PADDING * 2 ) then
-        ouTextPlc.sizeX = panelPlc.sizeX - CONFIG.GUI.PADDING * 2
-    else
-        ouTextPlc.sizeX = CONFIG.GUI.CONTAINER_SIZE_X
+    if panelPlc.sizeX < CONFIG.GUI.CONTAINER_SIZE_X then
+        panelPlc.posX = panelPlc.posX + CONFIG.GUI.CONTAINER_SIZE_X / 2 - panelPlc.sizeX / 2
+        panelPlc.sizeX = CONFIG.GUI.CONTAINER_SIZE_X
+        self._wtParent:SetPlacementPlain( panelPlc )
     end
     
-    self._wtTextContainer:SetPlacementPlain( ouTextPlc )
-    self._wtTextContainer:ForceReposition()
-    
     local contentPlc = self._wtTextContainer.wt__Border.wt__Content:GetPlacementPlain()
-    
-    -- Ширина: отступ слева (posX) и справа + фиксированная ширина текста
-    local targetSizeX = CONFIG.GUI.PADDING * 2 + ouTextPlc.sizeX
-    -- Высота: отступ сверху (posY) и снизу + высота текста
-    local targetSizeY = CONFIG.GUI.PADDING * 2 + contentPlc.posY + contentPlc.sizeY
+    -- Высота: Padding + высота текста
+    local targetSizeY = CONFIG.GUI.PADDING * 2 + contentPlc.sizeY
     
     if panelPlc.alignY == WIDGET_ALIGN_CENTER then
         -- Позиционирование от центра: окно смещается вниз от центра Y
         panelPlc.posY = panelPlc.posY - panelPlc.sizeY / 2 + targetSizeY / 2
     end
     
-    panelPlc.sizeX = targetSizeX
     panelPlc.sizeY = targetSizeY
     self._wtParent:SetPlacementPlain( panelPlc )
 end

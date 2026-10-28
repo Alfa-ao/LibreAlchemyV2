@@ -493,44 +493,6 @@ function DnDManager:OnDragCancelled()
 end
 
 --------------------------------------------------------------------------------
---- @param success boolean Успешно ли завершено перетаскивание.
---------------------------------------------------------------------------------
-function DnDManager:_StopDragging( success )
-    if not self:IsDragActive() then
-        self._activeDrag = nil
-        return
-    end
-
-    local state = self._activeDrag
-
-    if success then
-        state.info.wtReacting:DNDConfirmDropAttempt()
-        local finalPlacement = state.info.wtMovable:GetPlacementPlain()
-        
-        if state.info.isResize and state.info.resizeCallback then
-            local cb = state.info.resizeCallback
-            
-            if type( cb ) == "table" and type( cb[1] ) == "table" and type( cb[2] ) == "function" then
-                cb[2]( cb[1], finalPlacement )
-            elseif type( cb ) == "function" then
-                cb( finalPlacement )
-            end
-            
-            finalPlacement = state.info.wtMovable:GetPlacementPlain()
-        end
-
-        if state.info.saveToConfig then
-            self:_SaveConfig( state.info.configName, finalPlacement )
-        end
-    else
-        state.info.wtMovable:SetPlacementPlain( state.startPlacement )
-    end
-
-    self._activeDrag = nil
-    common.SetCursor( "default" )
-end
-
---------------------------------------------------------------------------------
 --- Возвращает виртуальный размер родителя виджета.
 --- @param wtWidget userdata|table Виджет.
 --- @return table ParentSize
@@ -574,17 +536,15 @@ end
 --------------------------------------------------------------------------------
 --- Расчёт границ родителя ( limitMin, limitMax ) с учётом alignX / alignY
 --- @param info table Информация о зарегистрированном виджете.
---- @param place table|nil WidgetPlacement. Если nil, берётся текущий placement виджета.
+--- @param place table WidgetPlacement. Если nil, берётся текущий placement виджета.
 --- @return table limits { min = limitMin, max = limitMax }
 --------------------------------------------------------------------------------
 function DnDManager:_PrepareLimits( info, place )
-    place = place or info.wtMovable:GetPlacementPlain()
-
     local screen = self._screenParams
     local ParentSize = self:_GetParentRealSize( info.wtMovable )
 
-    local sizeX = place.sizeX or 0
-    local sizeY = place.sizeY or 0
+    local sizeX = place.sizeX
+    local sizeY = place.sizeY
 
     local limitMin = {}
     local limitMax = {}
@@ -783,40 +743,38 @@ function DnDManager:_ProcessResizeAxis( plc, handlePlc, K, delta, limits, parent
 
     local handleAlign = handlePlc[ alignK ]
     local parentAlign = plc[ alignK ]
-
     local sizeDelta = 0
+    
     if handleAlign == WIDGET_ALIGN_HIGH then
         sizeDelta = delta
     elseif handleAlign == WIDGET_ALIGN_LOW then
         sizeDelta = -delta
     end
-    local oldSize = plc[ sizeK ] or 0
+    
+    local oldSize = plc[ sizeK ]
     local newSize = oldSize + sizeDelta
     
-    local minSize = limits.min or 0
-    local maxSize = limits.max or math.huge
-    
-    if newSize < minSize then
-        newSize = minSize
-    elseif newSize > maxSize then
-        newSize = maxSize
+    if newSize < limits.min then
+        newSize = limits.min
+    elseif newSize > limits.max then
+        newSize = limits.max
     end
-
+    
     local actualDelta = newSize - oldSize
     plc[ sizeK ] = newSize
 
     -- корректировка позиции относительно parent выравнивания
     if parentAlign == WIDGET_ALIGN_CENTER then
         if handleAlign == WIDGET_ALIGN_LOW then
-            plc[ posK ] = ( plc[ posK ] or 0 ) - actualDelta / 2
+            plc[ posK ] = plc[ posK ] - actualDelta / 2
         elseif handleAlign == WIDGET_ALIGN_HIGH then
-            plc[ posK ] = ( plc[ posK ] or 0 ) + actualDelta / 2
+            plc[ posK ] = plc[ posK ] + actualDelta / 2
         end
     else
         if handleAlign == WIDGET_ALIGN_LOW then
-            plc[ posK ] = ( plc[ posK ] or 0 ) - actualDelta
+            plc[ posK ] = plc[ posK ] - actualDelta
         elseif handleAlign == WIDGET_ALIGN_HIGH then
-            plc[ highPosK ] = ( plc[ highPosK ] or 0 ) - actualDelta
+            plc[ highPosK ] = plc[ highPosK ] - actualDelta
         end
     end
 
@@ -825,13 +783,13 @@ function DnDManager:_ProcessResizeAxis( plc, handlePlc, K, delta, limits, parent
         local left, right
         
         if parentAlign == WIDGET_ALIGN_LOW or parentAlign == WIDGET_ALIGN_LOW_ABS then
-            left = plc[ posK ] or 0
+            left = plc[ posK ]
             right = left + newSize
         elseif parentAlign == WIDGET_ALIGN_HIGH then
-            right = parentSize - ( plc[ highPosK ] or 0 )
+            right = parentSize - plc[ highPosK ]
             left = right - newSize
         elseif parentAlign == WIDGET_ALIGN_CENTER then
-            local center = parentSize / 2 + ( plc[ posK ] or 0 )
+            local center = parentSize / 2 + plc[ posK ]
             left = center - newSize / 2
             right = center + newSize / 2
         end
@@ -857,14 +815,14 @@ function DnDManager:_ProcessResizeAxis( plc, handlePlc, K, delta, limits, parent
         end
 
         -- если после ограничения границами родителя размер упал ниже минимального
-        if newSize < minSize then
-            local diff = minSize - newSize
+        if newSize < limits.min then
+            local diff = limits.min - newSize
             if handleAlign == WIDGET_ALIGN_LOW then
                 right = right + diff
             else
                 left = left - diff
             end
-            newSize = minSize
+            newSize = limits.min
             clamped = true
         end
 
@@ -880,6 +838,51 @@ function DnDManager:_ProcessResizeAxis( plc, handlePlc, K, delta, limits, parent
             end
         end
     end
+end
+
+--------------------------------------------------------------------------------
+--- @param success boolean Успешно ли завершено перетаскивание.
+--------------------------------------------------------------------------------
+function DnDManager:_StopDragging( success )
+    if not self:IsDragActive() then
+        self._activeDrag = nil
+        return
+    end
+
+    local state = self._activeDrag
+
+    if success then
+        state.info.wtReacting:DNDConfirmDropAttempt()
+        local finalPlacement = state.info.wtMovable:GetPlacementPlain()
+        
+        if state.info.isResize and state.info.resizeCallback then
+            local cb = state.info.resizeCallback
+            
+            if type( cb ) == "table" and type( cb[1] ) == "table" and type( cb[2] ) == "function" then
+                cb[2]( cb[1], state.info.wtMovable )
+            elseif type( cb ) == "function" then
+                cb( state.info.wtMovable )
+            end
+            
+            finalPlacement = state.info.wtMovable:GetPlacementPlain()
+            
+            if state.info.lockedToParentArea then
+                local limits = self:_PrepareLimits( state.info, finalPlacement )
+                finalPlacement = self:_NormalizePlacement( finalPlacement, limits.min, limits.max )
+            end
+            
+            state.info.wtMovable:SetPlacementPlain( finalPlacement )
+        end
+
+        if state.info.saveToConfig then
+            self:_SaveConfig( state.info.configName, finalPlacement )
+        end
+    else
+        state.info.wtMovable:SetPlacementPlain( state.startPlacement )
+    end
+
+    self._activeDrag = nil
+    common.SetCursor( "default" )
 end
 
 --------------------------------------------------------------------------------
@@ -914,6 +917,19 @@ function DnDManager:_SaveConfig( name, plc )
 	if not name then return end
     
     local config = self._options.configProvider.get() or {}
+    
+    if plc.alignX == WIDGET_ALIGN_HIGH then
+        plc.posX = 0
+    elseif plc.alignX == WIDGET_ALIGN_LOW or plc.alignX == WIDGET_ALIGN_CENTER then
+        plc.highPosX = 0
+    end
+    
+    if plc.alignY == WIDGET_ALIGN_HIGH then
+        plc.posY = 0
+    elseif plc.alignY == WIDGET_ALIGN_LOW or plc.alignY == WIDGET_ALIGN_CENTER then
+        plc.highPosY = 0
+    end
+    
 	config[ name ] = plc
     config.DnD_CONFIG_VERSION = self.__CONFIG_VERSION
     self._options.configProvider.set( config )
@@ -938,9 +954,13 @@ function DnDManager:_LoadConfig( info )
     
     local plc = info.wtMovable:GetPlacementPlain()
     
-    for k, v in pairs( config ) do
-        plc[k] = v
+    if config.alignX ~= plc.alignX or config.alignY ~= plc.alignY then
+        LogWarning( "DndManager:_LoadConfig alignment discrepancy detected." )
+        config.alignX = plc.alignX
+        config.alignY = plc.alignY
     end
+    
+    plc = config
     
     if info.lockedToParentArea then
         local limits = self:_PrepareLimits( info, plc )

@@ -15,8 +15,8 @@
                 "/Mods/SampleCommon/CoreScripts/AddonBase.lua": 100
             },
             "tag": "Alfa-ao/DebugService",
-            "version": "v1.0.0",
-            "sha": "dd5b19674cf2f4c6c7ea0d8383a96fd8b175c899"
+            "version": "v1.0.1",
+            "sha": "da0896139e45b4e4b8a497273533433e73d511b5"
         },
         {
             "name": "Enum",
@@ -52,8 +52,8 @@
                 "src/DnDManager.lua": 20
             },
             "tag": "Alfa-ao/DnDManager",
-            "version": "v1.4.0",
-            "sha": "3ed880b0667b7e9b0e5434aa4322ca927df3ad6a"
+            "version": "v1.4.1",
+            "sha": "51380d4473c09c858070457a56f95fc10c9f50dd"
         }
     ]
 }

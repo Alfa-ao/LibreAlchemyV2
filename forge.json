@@ -10,11 +10,11 @@
         }
     ],
     "require": {
-        "api": "17.0.01.74",
         "useCommonScripts": false,
-        "Alfa-ao/DebugService": "v1.0.0",
         "Alfa-ao/Enum": "v1.1.0",
-        "Alfa-ao/DnDManager": "v1.4.0"
+        "api": "17.0.01.74",
+        "Alfa-ao/DebugService": "v1.0.1",
+        "Alfa-ao/DnDManager": "v1.4.1"
     },
     "files": {
         "/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua": 100,

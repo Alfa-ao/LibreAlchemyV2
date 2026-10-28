@@ -3,14 +3,7 @@
     <Name>Panel</Name>
     <Priority>0</Priority>
     <Children>
-        <Item href="TextContainer.(WidgetTextContainer).xdb" />
-		<Item href="DragResize/DragTopLeft.(WidgetButton).xdb" />
-		<Item href="DragResize/DragTopCenter.(WidgetButton).xdb" />
-		<Item href="DragResize/DragTopRight.(WidgetButton).xdb" />
-		<Item href="DragResize/DragCenterLeft.(WidgetButton).xdb" />
-		<Item href="DragResize/DragCenterRight.(WidgetButton).xdb" />
-		<Item href="DragResize/DragBottomLeft.(WidgetButton).xdb" />
-		<Item href="DragResize/DragBottomCenter.(WidgetButton).xdb" />
+        <Item href="Padding.(WidgetPanel).xdb" />
 		<Item href="DragResize/DragBottomRight.(WidgetButton).xdb" />
     </Children>
     <BackLayer href="../Textures/Background/Background.(WidgetLayerTiledTexture).xdb" />
@@ -18,7 +11,7 @@
         <X>
             <Align>WIDGET_ALIGN_CENTER</Align>
             <Sizing>WIDGET_SIZING_DEFAULT</Sizing>
-            <Size>100</Size>
+            <Size>560</Size>
             <Pos>0</Pos>
         </X>
         <Y>

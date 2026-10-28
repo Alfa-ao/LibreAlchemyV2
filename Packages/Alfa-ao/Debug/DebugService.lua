@@ -7,22 +7,20 @@
 local config = { DEBUG = false, DEBUG_REACTION = true }
 
 -- Создаются две функции: DebugService.LogGeneral и DebugService.LogReaction
-DebugService.Init { General = config.DEBUG, Reaction = config.DEBUG_REACTION }
+DebugService:Init { General = config.DEBUG, Reaction = config.DEBUG_REACTION }
 
 -- Вывод в mods.txt
-DebugService.LogGeneral( 111, _G.mainForm ) -- игнорируется
+DebugService.LogGeneral( 111, mainForm ) -- игнорируется
 DebugService.LogReaction( 222 ) -- выведет: 222
 
 
 -- Дополнительно для быстроты и удобства:
-log( 111, 222, {}, _G.mainForm )
+log( 111, 222, {}, mainForm )
 
 ]]
 --------------------------------------------------------------------------------
 
 Global( "DebugService", {} )
-
-local _categories = {}
 
 
 
@@ -51,16 +49,17 @@ end )
 --------------------------------------------------------------------------------
 --- @param categories table Таблица состояния категорий логирования (category - имя категории, значение - boolean).
 --------------------------------------------------------------------------------
-function DebugService.Init( categories )
-	_categories = type( categories ) == "table" and categories or {}
+function DebugService:Init( categories )
+	self._categories = type( categories ) == "table" and categories or {}
 	
-	for category, _ in pairs( _categories ) do
+	for category, _ in pairs( self._categories ) do
         local methodName = "Log" .. category
         DebugService[ methodName ] = function( ... )
-            DebugService.Log( category, ... )
+            DebugService:Log( category, ... )
         end
     end
-	advEvent.RegisterEventHandlers( false, DebugService.GetActiveEventHandlers() )
+	
+	advEvent.RegisterEventHandlers( false, self:GetEventHandlers() )
 end
 
 
@@ -70,9 +69,9 @@ end
 --- @param category string имя категории
 --- @param isEnabled boolean 
 --------------------------------------------------------------------------------
-function DebugService.SetEnabled( category, isEnabled )
-	if _categories[category] ~= nil then
-		_categories[category] = isEnabled
+function DebugService:SetEnabled( category, isEnabled )
+	if self._categories[category] ~= nil then
+		self._categories[category] = isEnabled
 	end
 end
 
@@ -83,8 +82,8 @@ end
 --- @param category string Имя категории
 --- @return boolean
 --------------------------------------------------------------------------------
-function DebugService.IsEnabled( category )
-	return _categories[category] == true
+function DebugService:IsEnabled( category )
+	return self._categories[category] == true
 end
 
 
@@ -94,8 +93,8 @@ end
 --- @param category string Категория логирования
 --- @param ... any
 --------------------------------------------------------------------------------
-function DebugService.Log( category, ... )
-	if not DebugService.IsEnabled( category ) then
+function DebugService:Log( category, ... )
+	if not self:IsEnabled( category ) then
 		return
 	end
 	
@@ -105,7 +104,7 @@ function DebugService.Log( category, ... )
 		if type( v ) == "function" then
 			args[i] = v() -- Если дебаг блок в функции
 		elseif not ( _console_api or _var_dump_exists ) and apitype( v ) == "WString" then
-			args[i] = string.format( "WString( %s )", userMods.FromWString( v ) )
+			args[i] = string.format( "WString( %s )", FromWs( v ) )
 		else
 			args[i] = v
 		end
@@ -119,7 +118,7 @@ end
 --------------------------------------------------------------------------------
 --- @return table handlers
 --------------------------------------------------------------------------------
-function DebugService.GetActiveEventHandlers()
+function DebugService:GetEventHandlers()
     return {
         {
             function()

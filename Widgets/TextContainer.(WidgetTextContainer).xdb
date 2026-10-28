@@ -6,15 +6,15 @@
 	<defaultTag>text</defaultTag>
 	<Placement>
 		<X>
-			<Align>WIDGET_ALIGN_LOW</Align>
+			<Align>WIDGET_ALIGN_BOTH</Align>
 			<Sizing>WIDGET_SIZING_DEFAULT</Sizing>
-            <Size>533</Size>
-			<Pos>15</Pos>
+            <Size>0</Size>
+			<Pos>0</Pos>
 		</X>
 		<Y>
-			<Align>WIDGET_ALIGN_LOW</Align>
-			<Sizing>WIDGET_SIZING_INTERNAL</Sizing><!-- Авторесайзинг по Y -->
-			<Pos>15</Pos>
+			<Align>WIDGET_ALIGN_BOTH</Align>
+			<Sizing>WIDGET_SIZING_DEFAULT</Sizing><!-- WIDGET_SIZING_INTERNAL Авторесайзинг по Y -->
+			<Pos>0</Pos>
 		</Y>
 	</Placement>
 	<clipContent>false</clipContent>

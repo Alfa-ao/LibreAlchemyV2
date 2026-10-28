@@ -86,8 +86,7 @@ function SearchService:FindBestRecipes()
     local drumShiftMap, drumRequiredComponents, totalDrumsCount = self._recipe:BuildDrumShiftMap( self._maxCorrections )
     self._drumShiftMap = drumShiftMap
     
-    local filteredRecipes = self._recipe:FilterByComponents( drumRequiredComponents, totalDrumsCount )
-    self._filteredRecipes = filteredRecipes
+    self._filteredRecipes = self._recipe:FilterByComponents( drumRequiredComponents, totalDrumsCount )
     
     local linesAvailability = {
         plusOne  = avatar.IsAlchemyLineAvailable( 1 ) and {} or nil,
