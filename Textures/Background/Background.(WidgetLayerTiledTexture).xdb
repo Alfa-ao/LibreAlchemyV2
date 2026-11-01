@@ -4,13 +4,16 @@
 	<Grayed>false</Grayed>
 	<BlendEffect>BLEND_EFFECT_ALPHABLND</BlendEffect>
 	<flatPlacement>false</flatPlacement>
+	<lazyLoad>false</lazyLoad>
 	<textureItem href="Background.(UISingleTexture).xdb" />
 	<Layout>
 		<LeftX>10</LeftX>
-		<MiddleX>64</MiddleX>
+		<MiddleX>108</MiddleX>
 		<RightX>10</RightX>
 		<TopY>10</TopY>
-		<MiddleY>64</MiddleY>
+		<MiddleY>108</MiddleY>
 		<BottomY>10</BottomY>
 	</Layout>
+	<layoutTypeX>WIDGET_LAYER_TILED_LAYOUT_TYPE_TILED</layoutTypeX>
+	<layoutTypeY>WIDGET_LAYER_TILED_LAYOUT_TYPE_TILED</layoutTypeY>
 </WidgetLayerTiledTexture>

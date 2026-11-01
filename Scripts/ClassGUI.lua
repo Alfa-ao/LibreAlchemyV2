@@ -127,16 +127,18 @@ function GUI:UpdateSizePanel()
     end
     
     local contentPlc = self._wtTextContainer.wt__Border.wt__Content:GetPlacementPlain()
-    -- Высота: Padding + высота текста
+    -- Padding + высота текста
     local targetSizeY = CONFIG.GUI.PADDING * 2 + contentPlc.sizeY
     
     if panelPlc.alignY == WIDGET_ALIGN_CENTER then
-        -- Позиционирование от центра: окно смещается вниз от центра Y
+        -- окно смещается вниз от центра Y
         panelPlc.posY = panelPlc.posY - panelPlc.sizeY / 2 + targetSizeY / 2
     end
     
     panelPlc.sizeY = targetSizeY
     self._wtParent:SetPlacementPlain( panelPlc )
+    
+    DnDManager:UpdateSavedPlacement( self._wtParent )
 end
 
 --------------------------------------------------------------------------------

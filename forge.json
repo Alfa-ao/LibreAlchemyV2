@@ -12,9 +12,9 @@
     "require": {
         "useCommonScripts": false,
         "Alfa-ao/Enum": "v1.1.0",
-        "api": "17.0.01.74",
         "Alfa-ao/DebugService": "v1.0.1",
-        "Alfa-ao/DnDManager": "v1.4.1"
+        "api": "17.0.01.78",
+        "Alfa-ao/DnDManager": "v1.4.3"
     },
     "files": {
         "/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua": 100,
