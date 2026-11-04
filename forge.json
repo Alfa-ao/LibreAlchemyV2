@@ -11,7 +11,6 @@
     ],
     "require": {
         "useCommonScripts": true,
-        "Alfa-ao/Enum": "v1.1.0",
         "Alfa-ao/DebugService": "v1.0.1",
         "api": "17.0.01.78",
         "Alfa-ao/DnDManager": "v1.4.3.127"

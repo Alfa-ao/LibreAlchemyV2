@@ -130,7 +130,7 @@ end
 --- @param params table { actionType: string, itemObject: ValuedObjectLua }
 --------------------------------------------------------------------------------
 function EventHandlers:OnItemTaken( params )
-    if not ( mainForm:IsVisible() and EnumTakeItemActionType.CRAFT:Equals( params.actionType ) ) then
+    if not ( mainForm:IsVisible() and params.actionType == "ENUM_TakeItemActionType_Craft" ) then
         return
     end
     

@@ -19,24 +19,6 @@
             "sha": "da0896139e45b4e4b8a497273533433e73d511b5"
         },
         {
-            "name": "Enum",
-            "type": "Library",
-            "execute": {
-                "unpack": [
-                    "src/EnumFactory.lua",
-                    "src/Definitions/TakeItemActionType.lua"
-                ]
-            },
-            "files": {
-                "/Mods/SampleCommon/CoreScripts/ClassesImplementation.lua": 100,
-                "src/EnumFactory.lua": 20,
-                "src/Definitions/TakeItemActionType.lua": 19
-            },
-            "tag": "Alfa-ao/Enum",
-            "version": "v1.1.0",
-            "sha": "97afdd628638eac0657bad6f4ac0ad3705292aed"
-        },
-        {
             "name": "DnDManager",
             "type": "Library",
             "execute": {
