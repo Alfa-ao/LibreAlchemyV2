@@ -19,7 +19,6 @@ ClassViewService.lua - Сервис для управления GUI.
 
 Class( "ViewService", {
     messageType = CONFIG.MESSAGE_GREETINGS, -- number Изначальный тип сообщения.
-    _taskRefResetMessageType = nil
 } )
 
 --------------------------------------------------------------------------------
@@ -67,7 +66,7 @@ function ViewService:ShowPotentialRecipes( countRecipe, filledSlotsCount )
     if countRecipe > 0 then
         local vtCountRecipes = common.CreateValuedText {
             format = GetAddonText( self._localization, "COUNT_RECIPES" ),
-            count  = countRecipe,
+            count = countRecipe,
         }
         self._gui:SetLines( vtCountRecipes )
     elseif filledSlotsCount > 0 then
@@ -104,8 +103,8 @@ end
 function ViewService:ShowItemTaken( potionName, count )
     local vtItem = common.CreateValuedText {
         format = GetAddonText( self._localization, "AVATAR_ITEM_TAKEN" ),
-        name   = potionName,
-        count  = count,
+        name = potionName,
+        count = count,
         class1 = "alchemy-yellow-text",
     }
     
@@ -137,8 +136,8 @@ function ViewService:FormatResults( found, maxDisplay, drumsCount )
         -- Таблица значений для подстановки в основной шаблон
         local textValues = {
             format = recipeLineFormat,
-            level  = foundResult.recipe.score,
-            name   = foundResult.recipe.name,
+            level = foundResult.recipe.score,
+            name = foundResult.recipe.name,
             class1 = currentRecipeName == foundResult.recipe.name and "alchemy-yellow-text" or nil
         }
         
@@ -149,7 +148,7 @@ function ViewService:FormatResults( found, maxDisplay, drumsCount )
             textValues[ "bulb" .. drumIndex ] = ToWs( string.format( "% d", -foundResult.shifts[ drumIndex ] ) )
         end
 		
-        linesData[ #linesData + 1 ] = common.CreateValuedText( textValues )
+        table.insert( linesData, common.CreateValuedText( textValues ) )
     end
     
     return linesData
@@ -174,7 +173,7 @@ function ViewService:ResultsForLog( found, maxDisplay, drumsCount )
 		end
 		
 		logStr = logStr .. "," .. FromWs( foundResult.recipe.name )
-		parts[ #parts + 1 ] = logStr
+        table.insert( parts, logStr )
 	end
 	
 	return "EVENT_ALCHEMY_REACTION_FINISHED:" .. table.concat( parts, "|" )

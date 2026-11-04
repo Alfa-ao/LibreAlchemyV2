@@ -4,20 +4,19 @@ ClassEventHandlers.lua - Сервис для обработки событий.
 
 Класс EventHandlers реализует следующие методы:
     self.Init
-    self.OnStarted          - Обработка EVENT_ALCHEMY_STARTED. Открытие окна алхимии.
-    self.OnCanceled         - Обработка EVENT_ALCHEMY_CANCELED. Закрытие окна алхимии или выход в меню рецептов.
-    self.OnItemPlaced       - Обработка EVENT_ALCHEMY_ITEM_PLACED. Размещение или извлечение предмета из слота.
-    self.OnReactionFinished - Обработка EVENT_ALCHEMY_REACTION_FINISHED. Запуск процесса варки зелья.
-    self.OnRecipesChanged   - Обработка EVENT_ALCHEMY_RECIPES_CHANGED. Изменение списка доступных рецептов.
-    self.OnItemTaken        - Обработка EVENT_AVATAR_ITEM_TAKEN. Получение предмета в инвентарь.
+    self.OnStarted          - EVENT_ALCHEMY_STARTED. Открытие окна алхимии.
+    self.OnCanceled         - EVENT_ALCHEMY_CANCELED. Закрытие окна алхимии или выход в меню рецептов.
+    self.OnItemPlaced       - EVENT_ALCHEMY_ITEM_PLACED. Размещение или извлечение предмета из слота.
+    self.OnReactionFinished - EVENT_ALCHEMY_REACTION_FINISHED. Запуск процесса варки зелья.
+    self.OnRecipesChanged   - EVENT_ALCHEMY_RECIPES_CHANGED. Изменение списка доступных рецептов.
+    self.OnItemTaken        - EVENT_AVATAR_ITEM_TAKEN. Получение предмета в инвентарь.
     self.CancelDelayedCalls - Отмена всех запланированных отложенных вызовов.
-    self.GetEventHandlers   - Получение списка обработчиков для регистрации в системе событий.
+    self.GetEventHandlers   - Получение списка обработчиков для регистрации событий.
 ]]
 --------------------------------------------------------------------------------
 
 Class( "EventHandlers", {
     _reactionSuccess = false, -- true: чтобы при получении предмета показать поздравление с кол-вом полученного предмета.
-    _taskRefItemPlaced = nil,
 } )
 
 --------------------------------------------------------------------------------

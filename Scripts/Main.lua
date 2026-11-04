@@ -9,7 +9,7 @@ local searchService = SearchService() -- поиск и сопоставлени�
 searchService:Init( recipeService )
 
 -- Перетаскивание виджета
-DnDManager:Init { defaultCursor = CONFIG.DND.CURSOR }
+DnDManager:Init()
 
 --------------------------------------------------------------------------------
 -- Интерфейс
@@ -23,7 +23,7 @@ gui:Init(
 
 viewService:Init( common.GetLocalization(), gui )
 
-DnDManager:Register( mainForm.wtPanel, { saveToConfig = CONFIG.DND.SAVE },
+DnDManager:Register( mainForm.wtPanel, { saveToConfig = true },
 {
     {
         wtHandle = mainForm.wtPanel.wtDragBottomRight,

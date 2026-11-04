@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 --[[
-ClassGUI.lua - Общий слой для работы с нативным виджетом и кастомизацией.
+ClassGUI.lua - Отвечает за текстовый контейнер и его родителя, а так же для кастомизации.
 
 Класс GUI реализует следующие методы:
     self.Init
@@ -41,15 +41,13 @@ function GUI:Init( wtAlchemyV2, wtPanel, wtTextContainer )
     p.highPosY = CONFIG.GUI.PADDING
     wtPanel.wtPadding:SetPlacementPlain( p )
     
-    self:CustomStyle()
+    if CONFIG.ENABLE_CUSTOM_LAYOUT then
+        self:CustomStyle()
+    end
 end
 
 --------------------------------------------------------------------------------
 function GUI:CustomStyle()
-    if not CONFIG.ENABLE_CUSTOM_LAYOUT then
-        return
-    end
-    
     local listBars = {}
     for i = 1, 5 do
         listBars[ i ] = self._wtRolls:GetChildChecked( "Bar0" .. i )
@@ -108,7 +106,7 @@ end
 function GUI:SetLines( ... )
     self._wtTextContainer:RemoveItems()
 	
-	for _, line in ipairs { ... }  do
+	for _, line in ipairs { ... } do
 		self._wtTextContainer:PushBackText( line )
 	end
 	
@@ -137,8 +135,6 @@ function GUI:UpdateSizePanel()
     
     panelPlc.sizeY = targetSizeY
     self._wtParent:SetPlacementPlain( panelPlc )
-    
-    DnDManager:UpdateSavedPlacement( self._wtParent )
 end
 
 --------------------------------------------------------------------------------

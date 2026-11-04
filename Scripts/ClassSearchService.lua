@@ -12,14 +12,10 @@ ClassSearchService.lua - Сервис для поиска рецептов ал�
 --------------------------------------------------------------------------------
 
 Class( "SearchService", {
-    _foundSet = {},
     _drumsCount = 1,
-    _maxCorrections = 0,
-    _drumShiftMap = nil,
-    _filteredRecipes = nil,
 } )
 
--- [I] Добавление компонента по смещению
+-- Добавление компонента по смещению
 local function addComp( drumShiftMap, drumIdx, shift, offset, line )
     if not line then return nil end
     local comp = drumShiftMap[ drumIdx ][ shift + offset ]
@@ -30,7 +26,7 @@ local function addComp( drumShiftMap, drumIdx, shift, offset, line )
     return nil
 end
 
--- [I] Откат счётчика компонента
+-- Откат счётчика компонента
 local function removeComp( line, comp )
     if not comp then return end
     line[ comp ] = line[ comp ] - 1
@@ -80,8 +76,7 @@ function SearchService:FindBestRecipes()
     local alchemyInfo = avatar.GetAlchemyInfo()
     
     self._drumsCount = alchemyInfo.drumsCount or self._drumsCount
-    local firstDrumInfo = avatar.GetAlchemyDrumInfo( 0 )
-    self._maxCorrections = firstDrumInfo and firstDrumInfo.maxCorrectionsPerColumn or 0
+    self._maxCorrections = avatar.GetAlchemyDrumInfo( 0 ).maxCorrectionsPerColumn or 0
     
     local drumShiftMap, drumRequiredComponents, totalDrumsCount = self._recipe:BuildDrumShiftMap( self._maxCorrections )
     self._drumShiftMap = drumShiftMap
@@ -174,7 +169,11 @@ function SearchService:ExecuteBacktracking( totalCorrections, linesAvailability 
     
     for shiftsLeft = 0, totalCorrections do
         recursiveSearch(
-            drumsCount, shiftsLeft, linesAvailability.zero, linesAvailability.minusOne, linesAvailability.plusOne
+            drumsCount,
+            shiftsLeft,
+            linesAvailability.zero,
+            linesAvailability.minusOne,
+            linesAvailability.plusOne
         )
     end
     
