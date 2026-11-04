@@ -4,6 +4,35 @@
 
 
 
+## [v2.5.0](https://github.com/Alfa-ao/LibreAlchemyV2/releases/tag/v2.5.0)
+
+### Added
+
+- Добавлены файлы `forge.json` и `Packages/packages.json` для управления зависимостями через утилиту `ForgePackage`.
+- Добавлена возможность изменения размера панели подсказки за перетаскивание нижнего правого угла.
+
+### Changed
+
+- Упрощена архитектура.
+  - Все Lua-скрипты аддона теперь лежат в корне `Scripts/`.
+  - `Scripts/Core/AlchemyInit.lua` заменён на `Scripts/Main.lua`.
+  - Логика поиска `DrumShiftMapper`, `BacktrackingSearchAlgorithm`, `RecipeEvaluator` объединена в один файл `Scripts/ClassSearchService.lua`.
+  - Обработчики событий алхимии и аватара `AlchemyEvents`, `AlchemyAvatarEvents` объединены в `Scripts/ClassEventHandlers.lua`.
+  - Обертки виджетов `WidgetAlchemyV2`, `WidgetTextContainer` объединены в `Scripts/ClassGUI.lua`.
+- Зависимости.
+  - `DnDManager` Обновлён до версии `v1.4.3.127`.
+  - `DebugService` Обновлён до версии `v1.0.1`.
+- `AddonDesc.(UIAddon).xdb` убран список подключений `/Mods/SampleCommon/CoreScripts/...`. Вместо них используется `useCommonScripts = true`.
+- Структура виджетов изменена на `Main` -> `Panel` -> `Padding` -> `TextContainer`.
+
+### Removed
+
+- Полностью удалён класс `AlchemyState`.
+- `Libs/` вся папка, зависимости теперь в `Packages/`.
+- Удалена библиотека `EnumFactory`.
+
+
+
 ## [v2.4.0](https://github.com/Alfa-ao/LibreAlchemyV2/releases/tag/v2.4.0)
 
 ### Added
@@ -27,7 +56,7 @@
 - GUI `WidgetTextContainer`: `Init()` больше не принимает параметров - отступ берётся из `CONFIG.GUI.PADDING`. `UpdateCenterPanel()` упрощён: позиция рассчитывается через `CONFIG.GUI.POS_X` и `CONFIG.GUI.SIZE_Y`.
 - `Panel.(WidgetPanel).xdb`: выравнивание изменено на `WIDGET_ALIGN_CENTER` по обеим осям, начальные размеры и позиции обнулены (управляются из Lua).
 - `ouText.(WidgetTextContainer).xdb`: ширина уменьшена с `570` до `533`.
-- `AddonDesc.(UIAddon).xdb`: подключены дополнительные CoreScripts (`AddonBaseUserMods`, `AddonBase`, `WidgetCoreUserMods`, `AdvancedHandlersUserMods`).
+- `AddonDesc.(UIAddon).xdb`: подключены дополнительные CoreScripts `AddonBaseUserMods`, `AddonBase`, `WidgetCoreUserMods`, `AdvancedHandlersUserMods`.
 - Позиционирование: изменена логика позиционирования виджета подсказки. Теперь корректно отображается при масштабировании.
 
 ### Removed
@@ -36,7 +65,7 @@
 - Удалён файл `Scripts/Services/AlchemyRelatedTextService.lua`.
 - Удалена зависимость от `/Mods/SampleCommon/SampleAddonBase.lua` `GetTableSize`.
 - Удалены параметры `GUI.PANEL_HALF_WIDTH` и `GUI.PANEL_OFFSET_X` из `Config.lua`.
-- Удалён кэш имён компонентов (`_componentNamesCache`, `GetComponentName`) из `AlchemyRecipeService`.
+- Удалён кэш имён компонентов `_componentNamesCache`, `GetComponentName` из `AlchemyRecipeService`.
 
 
 
@@ -90,7 +119,7 @@
 - В шаблонах `RECIPE_LINE.txt` и `ContainerFormat.txt`, а также в `COUNT_RECIPES.txt` тег `<log fontsize="15">` заменен на кастомный тег `<alchemy>`. В `RECIPE_LINE.txt` добавлена поддержка CSS-виджета через `<rs class="class1">`.
 - Обработчик `EVENT_POS_CONVERTER_CHANGED` теперь явно обновляет размеры панели через `textContainerService`, что предотвращает смещение текста при изменении масштаба интерфейса игры.
 - `BacktrackingSearchAlgorithm` и `DrumShiftMapper` больше не принимают `mathUtils` через конструктор, а используют глобальный `MathUtils`.
-- `AlchemyRecipeService` теперь сохраняет имя рецепта как `WString` (ранее конвертировалось в строку).
+- `AlchemyRecipeService` теперь сохраняет имя рецепта как `WString`.
 - Обновлены строки локализации: добавлен префикс `LibreAlchemyV2: ` в `AVATAR_ITEM_TAKEN`.
 
 ### Removed
