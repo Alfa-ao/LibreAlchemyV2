@@ -22,7 +22,6 @@
 - Зависимости.
   - `DnDManager` Обновлён до версии `v1.4.3.127`.
   - `DebugService` Обновлён до версии `v1.0.1`.
-  - `EnumFactory` Обновлён до версии `v1.1.0`.
 - `AddonDesc.(UIAddon).xdb` убран список подключений `/Mods/SampleCommon/CoreScripts/...`. Вместо них используется `useCommonScripts = true`.
 - Структура виджетов изменена на `Main` -> `Panel` -> `Padding` -> `TextContainer`.
 
@@ -30,6 +29,7 @@
 
 - Полностью удалён класс `AlchemyState`.
 - `Libs/` вся папка, зависимости теперь в `Packages/`.
+- Удалена библиотека `EnumFactory`.
 
 
 
