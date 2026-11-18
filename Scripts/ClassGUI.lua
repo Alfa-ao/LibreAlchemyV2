@@ -34,13 +34,6 @@ function GUI:Init( wtAlchemyV2, wtPanel, wtTextContainer )
     self._wtParent = wtPanel
     self._wtTextContainer = wtTextContainer
     
-    local p = wtPanel.wtPadding:GetPlacementPlain()
-    p.posX = CONFIG.GUI.PADDING
-    p.posY = CONFIG.GUI.PADDING
-    p.highPosX = CONFIG.GUI.PADDING
-    p.highPosY = CONFIG.GUI.PADDING
-    wtPanel.wtPadding:SetPlacementPlain( p )
-    
     if CONFIG.ENABLE_CUSTOM_LAYOUT then
         self:CustomStyle()
     end
@@ -124,9 +117,10 @@ function GUI:UpdateSizePanel()
         self._wtParent:SetPlacementPlain( panelPlc )
     end
     
+    local borderPlc = self._wtTextContainer.wt__Border:GetPlacementPlain()
     local contentPlc = self._wtTextContainer.wt__Border.wt__Content:GetPlacementPlain()
-    -- Padding + высота текста
-    local targetSizeY = CONFIG.GUI.PADDING * 2 + contentPlc.sizeY
+    -- Border + высота контента
+    local targetSizeY = borderPlc.posY + borderPlc.highPosY + contentPlc.sizeY
     
     if panelPlc.alignY == WIDGET_ALIGN_CENTER then
         -- окно смещается вниз от центра Y
@@ -135,6 +129,8 @@ function GUI:UpdateSizePanel()
     
     panelPlc.sizeY = targetSizeY
     self._wtParent:SetPlacementPlain( panelPlc )
+    
+    DnDManager:UpdateSavedPlacement( self._wtParent )
 end
 
 --------------------------------------------------------------------------------

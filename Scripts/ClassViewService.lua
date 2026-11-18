@@ -129,26 +129,25 @@ function ViewService:FormatResults( found, maxDisplay, drumsCount )
     local currentRecipeName = self._gui:GetCurrentRecipeName()
 	-- Шаблон строки рецепта "level: N |N |N |N |N - name"
     local recipeLineFormat = GetAddonText( "template", "RECIPE_LINE" )
-	-- Создание строк для ТОП-N рецептов
-	local linesData = {}
+	local linesData = {} -- Создание строк для ТОП-N рецептов
+    
     for i = 1, math.min( #found, maxDisplay ) do
         local foundResult = found[ i ]
-        -- Таблица значений для подстановки в основной шаблон
-        local textValues = {
+        local lineBulbs = common.CreateValuedText {
             format = recipeLineFormat,
             level = foundResult.recipe.score,
             name = foundResult.recipe.name,
-            class1 = currentRecipeName == foundResult.recipe.name and "alchemy-yellow-text" or nil
         }
         
+        if currentRecipeName == foundResult.recipe.name then
+            lineBulbs:SetClassVal( "class1", "alchemy-yellow-text" )
+        end
+        
         for drumIndex = 1, drumsCount do
-			-- Форматируется сдвиг для отображения "% d" = " 1" or "-1". Функция не умеет работать с подобными форматами:
-            -- common.FormatInt( -foundResult.shifts[ drumIndex ], "% d" )
-            -- Бьётся: "UI::LuaCommonFormatInt: РфQx"
-            textValues[ "bulb" .. drumIndex ] = ToWs( string.format( "% d", -foundResult.shifts[ drumIndex ] ) )
+            lineBulbs:SetVal( "bulb" .. drumIndex, string.format( "% d", foundResult.shifts[ drumIndex ] ) )
         end
 		
-        table.insert( linesData, common.CreateValuedText( textValues ) )
+        table.insert( linesData, lineBulbs )
     end
     
     return linesData
@@ -166,10 +165,10 @@ function ViewService:ResultsForLog( found, maxDisplay, drumsCount )
 	for i = 1, math.min( #found, maxDisplay ) do
 		local foundResult = found[ i ]
 		
-		local logStr = string.format( "%d,%d", foundResult.recipe.score, -foundResult.shifts[ 1 ] )
+		local logStr = string.format( "%d,%d", foundResult.recipe.score, foundResult.shifts[ 1 ] )
 		
 		for drumIndex = 2, drumsCount do
-			logStr = logStr .. string.format( ",%d", -foundResult.shifts[ drumIndex ] )
+			logStr = logStr .. string.format( ",%d", foundResult.shifts[ drumIndex ] )
 		end
 		
 		logStr = logStr .. "," .. FromWs( foundResult.recipe.name )

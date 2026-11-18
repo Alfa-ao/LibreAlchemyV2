@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <WidgetPanel>
     <Name>Panel</Name>
-    <Priority>0</Priority>
     <Children>
-        <Item href="Padding.(WidgetPanel).xdb" />
 		<Item href="DragResize/DragBottomRight.(WidgetButton).xdb" />
+        <Item href="TextContainer.(WidgetTextContainer).xdb" />
     </Children>
     <BackLayer href="../Textures/Background/Background.(WidgetLayerTiledTexture).xdb" />
     <Placement>
@@ -21,8 +20,6 @@
             <Pos>0</Pos>
         </Y>
     </Placement>
-    <Visible>true</Visible>
-	<Enabled>true</Enabled>
 	<PickChildrenOnly>false</PickChildrenOnly>
 	<TransparentInput>false</TransparentInput>
 </WidgetPanel>

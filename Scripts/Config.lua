@@ -64,7 +64,6 @@ Global( "CONFIG", {
     GUI = {
         POS_X = -100, -- Сдвиг по оси X.
         SIZE_Y = 770, -- Размер AlchemyV2 на главном меню.
-        PADDING = 15, -- Отступ со всех сторон от края.
         CONTAINER_SIZE_X = 560,
         
         -- AlchemyV2

@@ -130,7 +130,7 @@ function SearchService:ExecuteBacktracking( totalCorrections, linesAvailability 
                 local addedPlus = addComp( drumShiftMap, drumIdx, shift, 1, linePlusOne )
                 
                 if addedZero or addedMinus or addedPlus then
-                    currentShifts[ drumIdx ] = shift
+                    currentShifts[ drumIdx ] = -shift -- reverse
                     recursiveSearch( drumIdx - 1, nextLeft, lineZero, lineMinusOne, linePlusOne )
                     currentShifts[ drumIdx ] = nil
                     removeComp( lineZero, addedZero )

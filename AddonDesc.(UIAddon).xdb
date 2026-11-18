@@ -24,15 +24,15 @@
     <textsGroups>
         <Item>
             <groupName>rus</groupName>
-            <texts href="Locales/lang/rus/Locale.(UIRelatedTexts).xdb" />
+            <texts href="Texts/lang/rus/Locale.(UIRelatedTexts).xdb" />
         </Item>
         <Item>
             <groupName>eng</groupName>
-            <texts href="Locales/lang/eng/Locale.(UIRelatedTexts).xdb" />
+            <texts href="Texts/lang/eng/Locale.(UIRelatedTexts).xdb" />
         </Item>
         <Item>
             <groupName>template</groupName>
-            <texts href="Locales/template/Locale.(UIRelatedTexts).xdb" />
+            <texts href="Texts/template/Locale.(UIRelatedTexts).xdb" />
         </Item>
     </textsGroups>
     <styleSheets>

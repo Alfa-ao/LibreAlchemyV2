@@ -1,30 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WidgetTextContainer>
 	<Name>TextContainer</Name>
-	<Priority>0</Priority>
-	<formatFileRef href="../Locales/ContainerFormat.txt" />
+	<formatFileRef href="../Texts/TextContainerFormat.txt" />
 	<defaultTag>text</defaultTag>
 	<Placement>
 		<X>
 			<Align>WIDGET_ALIGN_BOTH</Align>
-			<Sizing>WIDGET_SIZING_DEFAULT</Sizing>
-            <Size>0</Size>
-			<Pos>0</Pos>
 		</X>
 		<Y>
 			<Align>WIDGET_ALIGN_BOTH</Align>
-			<Sizing>WIDGET_SIZING_DEFAULT</Sizing><!-- WIDGET_SIZING_INTERNAL Авторесайзинг по Y -->
-			<Pos>0</Pos>
 		</Y>
 	</Placement>
-	<clipContent>false</clipContent>
-	
-	<widgetsArrangement>WIDGETS_ARRANGEMENT_T2B</widgetsArrangement>
-	
-	<elementsInterval>0</elementsInterval>
-	
+	<border href="Border.(WidgetPanel).xdb" />
 	<TransparentInput>true</TransparentInput>
 	<PickChildrenOnly>true</PickChildrenOnly>
-	<Visible>true</Visible>
-	<Enabled>true</Enabled>
 </WidgetTextContainer>

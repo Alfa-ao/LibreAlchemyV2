@@ -18,7 +18,7 @@ local gui = GUI()
 gui:Init(
     common.GetAddonMainForm( "AlchemyV2" ),
     mainForm.wtPanel,
-    mainForm.wtPanel.wtPadding.wtTextContainer
+    mainForm.wtPanel.wtTextContainer
 )
 
 viewService:Init( common.GetLocalization(), gui )

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <WidgetCss>
-    <Id>LibreALchemyV2</Id>
+    <Id>LibreAlchemyV2</Id>
     <Selectors>
         <Item>
             <Name>alchemy-yellow-text</Name>

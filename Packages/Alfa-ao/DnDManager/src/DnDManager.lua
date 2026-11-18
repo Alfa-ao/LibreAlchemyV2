@@ -694,7 +694,11 @@ function DnDManager:OnPosConverterChanged()
     
     for _, info in pairs( self._widgets ) do
         if info.lockedToParentArea and not info.isResize then
-            local saved = table.sclone( info.savedPlacement )
+            local plc = info.wtMovable:GetPlacementPlain()
+            local saved = info.savedPlacement
+            
+            saved.sizeX, saved.sizeY = plc.sizeX, plc.sizeY
+            
             self:_RestrictPlacement( saved, self:_GetParentRealSize( info.wtMovable ) )
             info.wtMovable:SetPlacementPlain( saved )
         end
