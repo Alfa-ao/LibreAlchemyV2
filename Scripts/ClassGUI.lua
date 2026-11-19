@@ -105,6 +105,7 @@ function GUI:SetLines( ... )
 	
     self._wtTextContainer:ForceReposition()
     self:UpdateSizePanel()
+    DnDManager:UpdateSavedPlacement( self._wtParent )
 end
 
 --------------------------------------------------------------------------------
@@ -129,8 +130,6 @@ function GUI:UpdateSizePanel()
     
     panelPlc.sizeY = targetSizeY
     self._wtParent:SetPlacementPlain( panelPlc )
-    
-    DnDManager:UpdateSavedPlacement( self._wtParent )
 end
 
 --------------------------------------------------------------------------------
