@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WidgetTextContainer>
 	<Name>TextContainer</Name>
+	<Children>
+		<Item href="DragResize/DragBottomRight.(WidgetButton).xdb" />
+    </Children>
+    <BackLayer href="../Textures/Background/Background.(WidgetLayerTiledTexture).xdb" />
 	<formatFileRef href="../Texts/TextContainerFormat.txt" />
 	<defaultTag>text</defaultTag>
 	<Placement>
-		<X>
-			<Align>WIDGET_ALIGN_BOTH</Align>
-		</X>
-		<Y>
-			<Align>WIDGET_ALIGN_BOTH</Align>
-		</Y>
-	</Placement>
+        <X>
+            <Align>WIDGET_ALIGN_CENTER</Align>
+            <Size>560</Size>
+        </X>
+        <Y>
+            <Align>WIDGET_ALIGN_CENTER</Align>
+            <Size>100</Size>
+        </Y>
+    </Placement>
+	<PickChildrenOnly>false</PickChildrenOnly>
+	<TransparentInput>false</TransparentInput>
 	<border href="Border.(WidgetPanel).xdb" />
-	<TransparentInput>true</TransparentInput>
-	<PickChildrenOnly>true</PickChildrenOnly>
 </WidgetTextContainer>

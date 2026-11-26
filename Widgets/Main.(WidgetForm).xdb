@@ -3,7 +3,7 @@
 	<Name>LibreAlchemyV2</Name>
 	<Priority>10000</Priority>
 	<Children>
-		<Item href="Panel.(WidgetPanel).xdb" />
+		<Item href="TextContainer.(WidgetTextContainer).xdb" />
 	</Children>
 	<Placement>
 		<X>

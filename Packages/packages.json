@@ -15,8 +15,8 @@
                 "/Mods/SampleCommon/CoreScripts/AddonBase.lua": 100
             },
             "tag": "Alfa-ao/DebugService",
-            "version": "v1.0.1",
-            "sha": "da0896139e45b4e4b8a497273533433e73d511b5"
+            "version": "v1.0.1.2",
+            "sha": "93d6c2231c818cddf8507d96893f2935c3cac137"
         },
         {
             "name": "DnDManager",

@@ -6,7 +6,7 @@
         <name href="AddonName.txt" />
         <description href="AddonDescription.txt" />
         <author>Alfa-ao</author>
-        <version>2.5.0</version>
+        <version>2.5.1</version>
         <apiVersion>18000000</apiVersion>
         <useCommonScripts>true</useCommonScripts>
     </userAddonInfo>
@@ -17,8 +17,7 @@
         <Item href="Scripts/ClassRecipeService.lua" />
         <Item href="Scripts/ClassSearchService.lua" />
         <Item href="Scripts/ClassViewService.lua" />
-        <Item href="Scripts/ClassGUI.lua" />
-        <Item href="Scripts/ClassEventHandlers.lua" />
+        <Item href="Scripts/ClassAlchemy.lua" />
         <Item href="Scripts/Main.lua" />
     </ScriptFileRefs>
     <textsGroups>

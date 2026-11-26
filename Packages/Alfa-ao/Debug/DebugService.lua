@@ -32,12 +32,13 @@ local _oldOptionReturnDump = _var_dump_exists and __CONFIG_VAR_DUMP.DEBUG.return
 -- Активация Console инструмента. Автоматически переключается.
 local _console_api = false
 
--- [P] Дополнительная функция log( ... ). Можно юзать везде для удобства.
+-- Дополнительная функция log( ... ). Можно юзать везде для удобства.
 Global( "log", function( ... )
 	if _console_api then
 		common.SendEvent( "CONSOLE_USERADDON_SEND_DATA", {
 			data = _var_dump_exists and var_dump( ... ) or { ... },
-			action = "highlight"
+			highlight = true,
+			var_dump = not _var_dump_exists
 		} )
 	else
 		( _var_dump_exists and var_dump or LogInfo )( ... )

@@ -2,7 +2,7 @@
     "name": "LibreAlchemyV2",
     "description": "",
     "type": "Addon",
-    "version": "2.5.0",
+    "version": "2.5.1",
     "license": "MIT",
     "authors": [
         {
@@ -11,17 +11,16 @@
     ],
     "require": {
         "useCommonScripts": true,
-        "Alfa-ao/DebugService": "v1.0.1",
         "api": "17.0.01.85",
-        "Alfa-ao/DnDManager": "v1.4.3.133"
+        "Alfa-ao/DnDManager": "v1.4.3.133",
+        "Alfa-ao/DebugService": "v1.0.1.2"
     },
     "files": {
         "Scripts/Config.lua": 50,
         "Scripts/ClassRecipeService.lua": 10,
         "Scripts/ClassSearchService.lua": 10,
         "Scripts/ClassViewService.lua": 10,
-        "Scripts/ClassGUI.lua": 10,
-        "Scripts/ClassEventHandlers.lua": 10,
+        "Scripts/ClassAlchemy.lua": 10,
         "Scripts/Main.lua": 0
     }
 }
